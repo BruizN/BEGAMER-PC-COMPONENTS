@@ -1,0 +1,22 @@
+@startuml
+set separator none
+title Nivel 2: Contenedores (Foco: Autenticación)
+
+left to right direction
+
+!include <C4/C4>
+!include <C4/C4_Context>
+!include <C4/C4_Container>
+
+Person(Administrador, "Administrador", $descr="Gestiona el stock y los precios de componentes.", $tags="", $link="")
+
+System_Boundary("BEGamerComponents_boundary", "BEGamer Components", $tags="") {
+  Container(BEGamerComponents.APIBackend, "API Backend", $techn="Python 3.11 + FastAPI", $descr="Maneja la autenticación (Login) y lógica de negocio.", $tags="", $link="")
+  ContainerDb(BEGamerComponents.BasedeDatos, "Base de Datos", $techn="PostgreSQL 16", $descr="Almacena usuarios, roles y hashes de contraseñas.", $tags="", $link="")
+}
+
+Rel(Administrador, BEGamerComponents.APIBackend, "Envía credenciales (POST /auth/login)", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend, BEGamerComponents.BasedeDatos, "Selecciona usuario y hash de contraseña", $techn="SQL/SQLAlchemy", $tags="", $link="")
+
+SHOW_LEGEND(true)
+@enduml

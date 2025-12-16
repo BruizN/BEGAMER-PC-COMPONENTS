@@ -1,0 +1,24 @@
+@startuml
+set separator none
+title Diagrama de Contexto - Venta de PC (Entorno Académico)
+
+left to right direction
+
+!include <C4/C4>
+!include <C4/C4_Context>
+
+Person(Cliente, "Cliente", $descr="Persona interesada en armar o mejorar su PC.", $tags="", $link="")
+Person(Administrador, "Administrador", $descr="Gestiona el stock y los precios de componentes.", $tags="", $link="")
+System(BEGamerComponents, "BEGamer Components", $descr="Plataforma para buscar, comparar y comprar hardware.", $tags="", $link="")
+System(PasareladePagosSandbox, "Pasarela de Pagos (Sandbox)", $descr="Gestiona transacciones bancarias en ambiente de pruebas.", $tags="", $link="")
+System(ServicioImpuestosInternosMock, "Servicio Impuestos Internos (Mock)", $descr="Simula la validación y emisión de boletas para fines académicos.", $tags="", $link="")
+System(SistemadeCorreo, "Sistema de Correo", $descr="Envía confirmaciones de órdenes y recuperación de claves.", $tags="", $link="")
+
+Rel(Administrador, BEGamerComponents, "Gestiona inventario", $techn="", $tags="", $link="")
+Rel(BEGamerComponents, PasareladePagosSandbox, "Inicia transacción y valida estado", $techn="", $tags="", $link="")
+Rel(BEGamerComponents, ServicioImpuestosInternosMock, "Solicita folio y timbre electrónico (Simulado)", $techn="", $tags="", $link="")
+Rel(BEGamerComponents, SistemadeCorreo, "Envía correos electrónicos a clientes", $techn="", $tags="", $link="")
+Rel(Cliente, BEGamerComponents, "Busca componentes y compra", $techn="", $tags="", $link="")
+
+SHOW_LEGEND(true)
+@enduml

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Search results | Name</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css" rel="stylesheet">
+    <link href="../../style.css" rel="stylesheet">
+    <link href="./../style-branding.css" rel="stylesheet">
+    <script type="text/javascript" src="../../modal.js"></script>
+    <script type="text/javascript" src="../../svg-modal.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.2/dist/svg-pan-zoom.min.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript" src="../../header.js"></script>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand has-site-branding"><a href="../" class="navbar-item"><span class="has-text-weight-semibold has-site-branding">Name</span></a></div>
+      <div class="navbar-menu has-site-branding">
+        <div class="navbar-end">
+          <div class="navbar-item"><input class="input is-small is-rounded" id="search" type="search" size="30" maxlength="50" placeholder="Search..." onkeyup="redirect(event, value, './')"></div>
+          <div class="navbar-item has-dropdown is-hoverable"><a class="navbar-link has-site-branding">master</a>
+            <div class="navbar-dropdown is-right"><a href="../../master/" class="navbar-item">master</a>
+              <hr class="navbar-divider">
+              <div class="navbar-item has-text-grey-light"><span>v</span><span>0.0.0</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="site-layout" id="site">
+      <aside class="menu p-3">
+        <p class="menu-label">General</p>
+        <ul class="menu-list has-site-branding">
+          <li><a href="../" class="">Home</a><a href="../software-systems/" class="">Software Systems</a></li>
+        </ul>
+        <p class="menu-label">Software systems</p>
+        <ul class="menu-list has-site-branding">
+          <li><a href="../begamer-components/" class="">BEGamer Components</a><a href="../pasarela-de-pagos-(sandbox)/" class="">Pasarela de Pagos (Sandbox)</a><a href="../servicio-impuestos-internos-(mock)/" class="">Servicio Impuestos Internos (Mock)</a><a href="../sistema-de-correo/" class="">Sistema de Correo</a></li>
+        </ul>
+      </aside>
+      <div class="container is-fluid">
+        <div class="content p-3">
+          <h2>Search results</h2>
+          <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
+          <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr-languages@1.14.0/min/lunr.stemmer.support.min.js"></script>
+          <script type="text/javascript">const documents = [{"href":"../begamer-components/","type":"Software System Info","title":"BEGamer Components | Modelo de Datos (Iteración 1: Autenticación)","text":"Modelo de Datos (Iteración 1: Autenticación) **Nota de Diseño:** Se utiliza UUIDv7 para la Clave Primaria. Esto permite mantener la base de datos indexada eficientemente por tiempo, evitando la fragmentación que producen los UUIDv4 aleatorios. ecommerce"},{"href":"../begamer-components/context/","type":"Context views","title":"BEGamer Components | Context views","text":"BEGamer Components Plataforma para buscar, comparar y comprar hardware."},{"href":"../begamer-components/container/","type":"Container views","title":"BEGamer Components | Container views","text":"API Backend Maneja la autenticación (Login) y lógica de negocio. Python 3.11 + FastAPI Base de Datos Almacena usuarios, roles y hashes de contraseñas. PostgreSQL 16"},{"href":"../begamer-components/dependencies/","type":"Dependencies","title":"BEGamer Components | Dependencies","text":"Pasarela de Pagos (Sandbox) Inicia transacción y valida estado Servicio Impuestos Internos (Mock) Solicita folio y timbre electrónico (Simulado) Sistema de Correo Envía correos electrónicos a clientes"},{"href":"../begamer-components/decisions/1/","type":"Software System Decision","title":"BEGamer Components | Selección de Stack Tecnológico para Backend","text":"Selección de Stack Tecnológico para Backend Contexto Decisión Consecuencias Positivas Negativas / Riesgos **Fecha:** 2025-12-09\n**Estado:** Aceptado El proyecto \"BEGamer Components\" requiere el desarrollo de una API REST eficiente y documentada para gestionar el inventario y las ventas. El equipo de desarrollo (unipersonal) cuenta con un tiempo limitado para la implementación y requiere herramientas que permitan un desarrollo ágil. Limitaciones: Se utilizará el lenguaje **Python** junto con el framework **FastAPI**. Se descartan otros lenguajes (como Java o C#) debido a la curva de aprendizaje que implicarían, lo cual pondría en riesgo los plazos de entrega del proyecto."},{"href":"../begamer-components/decisions/2/","type":"Software System Decision","title":"BEGamer Components |  Selección de Motor de Base de Datos Principal","text":"Selección de Motor de Base de Datos Principal Contexto Opciones Consideradas Decisión Justificación Consecuencias El sistema de e-commerce \"BEGamer Components\" requiere almacenar información de productos, usuarios, inventario y órdenes de compra. La integridad de los datos en las órdenes y el inventario es crítica (no podemos vender stock que no existe). Se seleccionará **PostgreSQL**. Al ser un e-commerce, la relación entre tablas (Usuario -> Orden -> Detalle -> Producto) es fuerte. Se necesitan transacciones ACID para asegurar que al comprar, se descuente el stock inmediatamente. PostgreSQL ofrece esto y además tiene buen soporte para JSON si se necesita guardar especificaciones técnicas flexibles de los PC."},{"href":"../begamer-components/decisions/3/","type":"Software System Decision","title":"BEGamer Components |  Selección de Estilo(Macro arquitectónico) y Patron Arquitectónico(Micro arquitectónico)","text":"Selección de Estilo(Macro arquitectónico) y Patron Arquitectónico(Micro arquitectónico) Contexto Estilos arquitectónicos considerados Patrones arquitectónicos considerados Decisión Justificación Consecuencias El sistema de e-commerce \"BEGamer Components\" requiere un estilo y patrones arquitectónicos que permitan una arquitectura limpia y mantenible. La arquitectura debe ser escalable y segura para proteger la información sensible de los usuarios. Se seleccionará **Monolitico modular** junto a **Layered Architecture**. El monolitico modular es una arquitectura donde toda la aplicación se despliega como una sola unidad (un solo artefacto/proceso), pero el código interno está estrictamente organizado en módulos de bajo acomplamiento basados en el dominio del negocio permitiendo que si se necesita escalar un modulo se puede convertir en un microservicio, gracias a que sigue siendo un monolito es mas simple para un equipo pequeño, a diferencia de microservicios que requieren mas experiencia y mas tiempo para implementar, pero seguimos conservando la ventaja de modulos con bajo acomplamiento. Ademas es optima para un equipo pequeño. Tambien debido al tamaño del equipo y del proyecto se escogera Layered Architecture ya que ofrece una forma simple de organizar el codigo. Se encontrara dentro de cada modulo(repository.py, router.py, service.py) y db.py como capa de infraestructura compartida."},{"href":"../pasarela-de-pagos-(sandbox)/","type":"Software System Info","title":"Pasarela de Pagos (Sandbox) | Info","text":"webpay"},{"href":"../pasarela-de-pagos-(sandbox)/context/","type":"Context views","title":"Pasarela de Pagos (Sandbox) | Context views","text":"Pasarela de Pagos (Sandbox) Gestiona transacciones bancarias en ambiente de pruebas."},{"href":"../pasarela-de-pagos-(sandbox)/dependencies/","type":"Dependencies","title":"Pasarela de Pagos (Sandbox) | Dependencies","text":"BEGamer Components Inicia transacción y valida estado"},{"href":"../servicio-impuestos-internos-(mock)/","type":"Software System Info","title":"Servicio Impuestos Internos (Mock) | Info","text":"sii"},{"href":"../servicio-impuestos-internos-(mock)/context/","type":"Context views","title":"Servicio Impuestos Internos (Mock) | Context views","text":"Servicio Impuestos Internos (Mock) Simula la validación y emisión de boletas para fines académicos."},{"href":"../servicio-impuestos-internos-(mock)/dependencies/","type":"Dependencies","title":"Servicio Impuestos Internos (Mock) | Dependencies","text":"BEGamer Components Solicita folio y timbre electrónico (Simulado)"},{"href":"../sistema-de-correo/","type":"Software System Info","title":"Sistema de Correo | Info","text":"email_system"},{"href":"../sistema-de-correo/context/","type":"Context views","title":"Sistema de Correo | Context views","text":"Sistema de Correo Envía confirmaciones de órdenes y recuperación de claves."},{"href":"../sistema-de-correo/dependencies/","type":"Dependencies","title":"Sistema de Correo | Dependencies","text":"BEGamer Components Envía correos electrónicos a clientes"}];const idx = lunr(function () {
+                        this.ref('href')
+                        this.field('text')
+
+                        documents.forEach(function (doc) {
+                          this.add(doc)
+                        }, this)
+                      });
+                    </script>
+          <script type="text/javascript" src="../../search.js"></script>
+          <div id="search-results"></div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="../../reformat-mermaid.js"></script>
+    <script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.9.0/dist/mermaid.esm.min.mjs';</script>
+  </body>
+</html>

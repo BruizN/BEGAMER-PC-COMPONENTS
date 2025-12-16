@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BEGamer Components | Name</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css" rel="stylesheet">
+    <link href="../../../../style.css" rel="stylesheet">
+    <link href="./../../../style-branding.css" rel="stylesheet">
+    <script type="text/javascript" src="../../../../modal.js"></script>
+    <script type="text/javascript" src="../../../../svg-modal.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.2/dist/svg-pan-zoom.min.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript" src="../../../../header.js"></script>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand has-site-branding"><a href="../../../" class="navbar-item"><span class="has-text-weight-semibold has-site-branding">Name</span></a></div>
+      <div class="navbar-menu has-site-branding">
+        <div class="navbar-end">
+          <div class="navbar-item"><input class="input is-small is-rounded" id="search" type="search" size="30" maxlength="50" placeholder="Search..." onkeyup="redirect(event, value, '../../../search/')"></div>
+          <div class="navbar-item has-dropdown is-hoverable"><a class="navbar-link has-site-branding">master</a>
+            <div class="navbar-dropdown is-right"><a href="../../../../master/" class="navbar-item">master</a>
+              <hr class="navbar-divider">
+              <div class="navbar-item has-text-grey-light"><span>v</span><span>0.0.0</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="site-layout" id="site">
+      <aside class="menu p-3">
+        <p class="menu-label">General</p>
+        <ul class="menu-list has-site-branding">
+          <li><a href="../../../" class="">Home</a><a href="../../../software-systems/" class="">Software Systems</a></li>
+        </ul>
+        <p class="menu-label">Software systems</p>
+        <ul class="menu-list has-site-branding">
+          <li><a href="../../" class="is-active">BEGamer Components</a><a href="../../../pasarela-de-pagos-(sandbox)/" class="">Pasarela de Pagos (Sandbox)</a><a href="../../../servicio-impuestos-internos-(mock)/" class="">Servicio Impuestos Internos (Mock)</a><a href="../../../sistema-de-correo/" class="">Sistema de Correo</a></li>
+        </ul>
+      </aside>
+      <div class="container is-fluid">
+        <h1 class="title mt-3">BEGamer Components</h1>
+        <h2 class="subtitle">Plataforma para buscar, comparar y comprar hardware.</h2>
+        <div class="tabs mt-3">
+          <ul class="is-flex-wrap-wrap is-flex-shrink-1 is-flex-grow-0">
+            <li><a href="../../" class="">Info</a></li>
+            <li><a href="../../context/" class="">Context views</a></li>
+            <li><a href="../../container/" class="">Container views</a></li>
+            <li><a href="../../dependencies/" class="">Dependencies</a></li>
+            <li class="is-active"><a href="../" class="is-active">Decisions</a></li>
+          </ul>
+        </div>
+        <div class="content p-3">
+          <div><h1>Selección de Estilo(Macro arquitectónico) y Patron Arquitectónico(Micro arquitectónico)</h1>
+<ul>
+ <li><strong>Estado:</strong> Aceptado</li>
+ <li><strong>Fecha:</strong> 2025-12-09</li>
+</ul>
+<h2>Contexto</h2>
+<p>El sistema de e-commerce "BEGamer Components" requiere un estilo y patrones arquitectónicos que permitan una arquitectura limpia y mantenible. La arquitectura debe ser escalable y segura para proteger la información sensible de los usuarios.</p>
+<h2>Estilos arquitectónicos considerados</h2>
+<ul>
+ <li>Monolitico</li>
+ <li>Microservicios</li>
+ <li>Monolitico modular</li>
+</ul>
+<h2>Patrones arquitectónicos considerados</h2>
+<ul>
+ <li>Hexagonal Architecture</li>
+ <li>Layered Architecture</li>
+</ul>
+<h2>Decisión</h2>
+<p>Se seleccionará <strong>Monolitico modular</strong> junto a <strong>Layered Architecture</strong>.</p>
+<h2>Justificación</h2>
+<p>El monolitico modular es una arquitectura donde toda la aplicación se despliega como una sola unidad (un solo artefacto/proceso), pero el código interno está estrictamente organizado en módulos de bajo acomplamiento basados en el dominio del negocio permitiendo que si se necesita escalar un modulo se puede convertir en un microservicio, gracias a que sigue siendo un monolito es mas simple para un equipo pequeño, a diferencia de microservicios que requieren mas experiencia y mas tiempo para implementar, pero seguimos conservando la ventaja de modulos con bajo acomplamiento. Ademas es optima para un equipo pequeño. Tambien debido al tamaño del equipo y del proyecto se escogera Layered Architecture ya que ofrece una forma simple de organizar el codigo. Se encontrara dentro de cada modulo(repository.py, router.py, service.py) y db.py como capa de infraestructura compartida.</p>
+<h3>Consecuencias</h3>
+<ul>
+ <li><strong>Positivas:</strong> El desarrollador cuenta con experiencia trabajando con esta arquitectura, ademas layered encaja muy bien con FastAPI.</li>
+ <li><strong>Negativas:</strong> Disciplina: Requiere madurez. Es muy fácil hacer trampa e importar código cruzado si no hay reglas de linter estrictas.</li>
+ <li><strong>Mitigacion:</strong> La comunicación entre módulos se realizará mediante llamadas a métodos públicos (interfaces de servicio) y no mediante consultas directas a tablas de otros módulos.</li>
+</ul></div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="../../../../reformat-mermaid.js"></script>
+    <script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.9.0/dist/mermaid.esm.min.mjs';</script>
+  </body>
+</html>
