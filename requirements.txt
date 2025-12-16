@@ -1,0 +1,9 @@
+fastapi[standard]
+sqlmodel
+asyncpg
+passlib[argon2]
+pyjwt
+uuid6
+ruff
+pytest
+pytest-asyncio

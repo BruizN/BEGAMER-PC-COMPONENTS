@@ -1,0 +1,26 @@
+.venv
+# --- Structurizr ---
+# Ignorar la carpeta de cache, logs e indices locales
+.structurizr/
+
+# Opcional: Si Structurizr Lite genera backups automáticos
+.structurizr-lite/
+
+# Opcional: Si solo quieres el DSL como fuente de verdad y no el JSON generado
+# (Aunque algunos prefieren guardarlo, yo te recomiendo ignorarlo si usas DSL)
+workspace.json
+# Carpeta de caché
+__pycache__/
+**/__pycache__/
+
+# Archivos compilados de Python
+*.py[cod]
+
+# Caché de tests
+.pytest_cache/
+# Entornos virtuales
+venv/
+.env/
+.env
+.venv/
+.envrc
