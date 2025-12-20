@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 import jwt
 from passlib.context import CryptContext
 from app.core.config import settings
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPBearer
 
 http_bearer = HTTPBearer(auto_error=True)
 
