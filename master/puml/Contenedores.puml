@@ -8,15 +8,17 @@ left to right direction
 !include <C4/C4_Context>
 !include <C4/C4_Container>
 
+Person(Cliente, "Cliente", $descr="Persona interesada en armar o mejorar su PC.", $tags="", $link="")
 Person(Administrador, "Administrador", $descr="Gestiona el stock y los precios de componentes.", $tags="", $link="")
 
 System_Boundary("BEGamerComponents_boundary", "BEGamer Components", $tags="") {
-  Container(BEGamerComponents.APIBackend, "API Backend", $techn="Python 3.11 + FastAPI", $descr="Maneja la autenticación (Login) y lógica de negocio.", $tags="", $link="")
-  ContainerDb(BEGamerComponents.BasedeDatos, "Base de Datos", $techn="PostgreSQL 16", $descr="Almacena usuarios, roles y hashes de contraseñas.", $tags="", $link="")
+  Container(BEGamerComponents.APIBackend, "API Backend", $techn="Python 3.11 slim + FastAPI", $descr="Maneja la autenticación (Login) y autorización.", $tags="", $link="")
+  ContainerDb(BEGamerComponents.BasedeDatos, "Base de Datos", $techn="PostgreSQL 15-alpine", $descr="Almacena usuarios, roles y hashes de contraseñas.", $tags="", $link="")
 }
 
-Rel(Administrador, BEGamerComponents.APIBackend, "Envía credenciales (POST /auth/login)", $techn="HTTPS/JSON", $tags="", $link="")
-Rel(BEGamerComponents.APIBackend, BEGamerComponents.BasedeDatos, "Selecciona usuario y hash de contraseña", $techn="SQL/SQLAlchemy", $tags="", $link="")
+Rel(Administrador, BEGamerComponents.APIBackend, "Interactúa vía Swagger UI para enviar credenciales con rol de administrador", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(Cliente, BEGamerComponents.APIBackend, "Interactúa vía Swagger UI para enviar credenciales con rol de client", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend, BEGamerComponents.BasedeDatos, "Selecciona usuario y hash de contraseña", $techn="SQL/SQLModel", $tags="", $link="")
 
 SHOW_LEGEND(true)
 @enduml

@@ -18,6 +18,13 @@
         "id" : "9",
         "sourceId" : "1",
         "tags" : "Relationship"
+      }, {
+        "description" : "Interactúa vía Swagger UI para enviar credenciales con rol de client",
+        "destinationId" : "4",
+        "id" : "15",
+        "sourceId" : "1",
+        "tags" : "Relationship",
+        "technology" : "HTTPS/JSON"
       } ],
       "tags" : "Element,Person"
     }, {
@@ -35,7 +42,7 @@
         "sourceId" : "2",
         "tags" : "Relationship"
       }, {
-        "description" : "Envía credenciales (POST /auth/login)",
+        "description" : "Interactúa vía Swagger UI para enviar credenciales con rol de administrador",
         "destinationId" : "4",
         "id" : "14",
         "sourceId" : "2",
@@ -46,7 +53,7 @@
     } ],
     "softwareSystems" : [ {
       "containers" : [ {
-        "description" : "Maneja la autenticación (Login) y lógica de negocio.",
+        "description" : "Maneja la autenticación (Login) y autorización.",
         "documentation" : { },
         "id" : "4",
         "name" : "API Backend",
@@ -56,13 +63,13 @@
         "relationships" : [ {
           "description" : "Selecciona usuario y hash de contraseña",
           "destinationId" : "5",
-          "id" : "15",
+          "id" : "16",
           "sourceId" : "4",
           "tags" : "Relationship",
-          "technology" : "SQL/SQLAlchemy"
+          "technology" : "SQL/SQLModel"
         } ],
         "tags" : "Element,Container,API",
-        "technology" : "Python 3.11 + FastAPI"
+        "technology" : "Python 3.11 slim + FastAPI"
       }, {
         "description" : "Almacena usuarios, roles y hashes de contraseñas.",
         "documentation" : { },
@@ -72,31 +79,38 @@
           "structurizr.dsl.identifier" : "database"
         },
         "tags" : "Element,Container,Database",
-        "technology" : "PostgreSQL 16"
+        "technology" : "PostgreSQL 15-alpine"
       } ],
       "description" : "Plataforma para buscar, comparar y comprar hardware.",
       "documentation" : {
         "decisions" : [ {
           "content" : "# 1. Selección de Stack Tecnológico para Backend\n\n**Fecha:** 2025-12-09\n**Estado:** Aceptado\n\n## Contexto\nEl proyecto \"BEGamer Components\" requiere el desarrollo de una API REST eficiente y documentada para gestionar el inventario y las ventas. El equipo de desarrollo (unipersonal) cuenta con un tiempo limitado para la implementación y requiere herramientas que permitan un desarrollo ágil.\n\nLimitaciones:\n* El desarrollador tiene experiencia previa y dominio de Python.\n* Se requiere validación de datos robusta para evitar errores en las órdenes de compra.\n\n## Decisión\nSe utilizará el lenguaje **Python** junto con el framework **FastAPI**.\n\nSe descartan otros lenguajes (como Java o C#) debido a la curva de aprendizaje que implicarían, lo cual pondría en riesgo los plazos de entrega del proyecto.\n\n## Consecuencias\n\n### Positivas\n* **Velocidad de Desarrollo:** Al aprovechar el conocimiento existente en Python, se reduce el tiempo de configuración y codificación (\"Time to market\").\n* **Documentación Automática:** FastAPI genera automáticamente documentación interactiva (Swagger UI / OpenAPI), lo cual es vital para probar los endpoints sin construir un frontend inmediatamente.\n* **Validación de Datos:** El uso de Pydantic (integrado en FastAPI) asegura que los datos de entrada (precios, stock) sean correctos antes de procesarlos.\n* **Asincronismo:** Permite manejar múltiples solicitudes concurrentes de manera eficiente.\n\n### Negativas / Riesgos\n* **Curva de Aprendizaje en Patrones Avanzados:** Aunque se conoce el framework, la implementación de patrones de arquitectura limpia y seguridad avanzada requerirá investigación adicional durante el desarrollo.",
-          "date" : "2025-12-23T14:25:33Z",
+          "date" : "2025-12-23T15:55:38Z",
           "format" : "Markdown",
           "id" : "1",
           "status" : "Proposed",
           "title" : "Selección de Stack Tecnológico para Backend"
         }, {
-          "content" : "# Selección de Motor de Base de Datos Principal\n\n* **Estado:** Aceptado\n* **Fecha:** 2025-12-09\n\n## Contexto\nEl sistema de e-commerce \"BEGamer Components\" requiere almacenar información de productos, usuarios, inventario y órdenes de compra. La integridad de los datos en las órdenes y el inventario es crítica (no podemos vender stock que no existe).\n\n\n## Opciones Consideradas\n* PostgreSQL\n* SQLite\n\n## Decisión\nSe seleccionará **PostgreSQL**.\n\n## Justificación\nAl ser un e-commerce, la relación entre tablas (Usuario -> Orden -> Detalle -> Producto) es fuerte. Se necesitan transacciones ACID para asegurar que al comprar, se descuente el stock inmediatamente. PostgreSQL ofrece esto y además tiene buen soporte para JSON si se necesita guardar especificaciones técnicas flexibles de los PC.\n\n### Consecuencias\n* **Positivas:** Integridad referencial fuerte. Stack tecnológico alineado con el mercado laboral enterprise, desarrollador con experiencia en PostgreSQL.\n* **Negativas:** Requiere definir esquemas (migrations) antes de programar, y una configuracion adicional para la base de datos PostgreSQL.\n* **Mitigacion:** Configurar la base de datos mediante docker y diagramar la base de datos con diagrama ER.",
-          "date" : "2025-12-23T14:25:33Z",
+          "content" : "# Selección de Motor de Base de Datos Principal y ORM\n\n* **Estado:** Aceptado\n* **Fecha:** 2025-12-09\n\n## Contexto\nEl sistema de e-commerce \"BEGamer Components\" requiere almacenar información de productos, usuarios, inventario y órdenes de compra. La integridad de los datos en las órdenes y el inventario es crítica (no podemos vender stock que no existe).\n\n\n## Opciones Consideradas como motor\n* PostgreSQL\n* SQLite\n\n## ORM\n* SQLModel\n\n## Decisión\nSe seleccionará **PostgreSQL** junto a **SQLModel**.\n\n## Justificación\nAl ser un e-commerce, la relación entre tablas (Usuario -> Orden -> Detalle -> Producto) es fuerte. Se necesitan transacciones ACID para asegurar que al comprar, se descuente el stock inmediatamente. PostgreSQL ofrece esto y además tiene buen soporte para JSON si se necesita guardar especificaciones técnicas flexibles de los PC. Para el ORM SQLModel es excelente considerando que se trabaja con FastAPI, ya que \nofrece la validación de datos de Pydantic y la definición de tablas como modelos entre otras cosas, usando SQLAlchemy por debajo.\n\n### Consecuencias\n* **Positivas:** Integridad referencial fuerte. Stack tecnológico alineado con el mercado laboral enterprise, desarrollador con experiencia en PostgreSQL. SQLModel creado por el mismo creador de FastAPI otorgando amplia compatibilidad y funcionamiento.\n* **Negativas:** Requiere definir esquemas (migrations) antes de programar, y una configuracion adicional para la base de datos PostgreSQL. Ademas de que se necesitaran usar librerias asincronas para compatibilidad con la app FastAPI asincrona.\n* **Mitigacion:** Configurar la base de datos mediante docker y diagramar la base de datos con diagrama ER, usar librerias asincronas como asyncpg y librerias de SQLAlchemy para manejar correctamente async.",
+          "date" : "2025-12-23T15:55:38Z",
           "format" : "Markdown",
           "id" : "2",
           "status" : "Proposed",
-          "title" : " Selección de Motor de Base de Datos Principal"
+          "title" : " Selección de Motor de Base de Datos Principal y ORM"
         }, {
-          "content" : "# Selección de Estilo(Macro arquitectónico) y Patron Arquitectónico(Micro arquitectónico)\n\n* **Estado:** Aceptado\n* **Fecha:** 2025-12-09\n\n## Contexto\nEl sistema de e-commerce \"BEGamer Components\" requiere un estilo y patrones arquitectónicos que permitan una arquitectura limpia y mantenible. La arquitectura debe ser escalable y segura para proteger la información sensible de los usuarios.\n\n## Estilos arquitectónicos considerados\n* Monolitico\n* Microservicios\n* Monolitico modular\n\n## Patrones arquitectónicos considerados\n* Hexagonal Architecture\n* Layered Architecture\n\n## Decisión\nSe seleccionará **Monolitico modular** junto a **Layered Architecture**.\n\n## Justificación\nEl monolitico modular es una arquitectura donde toda la aplicación se despliega como una sola unidad (un solo artefacto/proceso), pero el código interno está estrictamente organizado en módulos de bajo acomplamiento basados en el dominio del negocio permitiendo que si se necesita escalar un modulo se puede convertir en un microservicio, gracias a que sigue siendo un monolito es mas simple para un equipo pequeño, a diferencia de microservicios que requieren mas experiencia y mas tiempo para implementar, pero seguimos conservando la ventaja de modulos con bajo acomplamiento. Ademas es optima para un equipo pequeño. Tambien debido al tamaño del equipo y del proyecto se escogera Layered Architecture ya que ofrece una forma simple de organizar el codigo. Se encontrara dentro de cada modulo(repository.py, router.py, service.py) y db.py como capa de infraestructura compartida.\n\n### Consecuencias\n* **Positivas:** El desarrollador cuenta con experiencia trabajando con esta arquitectura, ademas layered encaja muy bien con FastAPI.\n* **Negativas:** Disciplina: Requiere madurez. Es muy fácil hacer trampa e importar código cruzado si no hay reglas de linter estrictas. \n* **Mitigacion:** La comunicación entre módulos se realizará mediante llamadas a métodos públicos (interfaces de servicio) y no mediante consultas directas a tablas de otros módulos.\n",
-          "date" : "2025-12-23T14:25:33Z",
+          "content" : "# Selección de Estilo(Macro arquitectónico) y Patron Arquitectónico(Micro arquitectónico)\n\n* **Estado:** Aceptado\n* **Fecha:** 2025-12-09\n\n## Contexto\nEl sistema de e-commerce \"BEGamer Components\" requiere un estilo y patrones arquitectónicos que permitan una arquitectura limpia y mantenible. La arquitectura debe ser escalable y segura para proteger la información sensible de los usuarios.\n\n## Estilos arquitectónicos considerados\n* Monolitico\n* Microservicios\n* Monolitico modular\n\n## Patrones arquitectónicos considerados\n* Hexagonal Architecture\n* Layered Architecture\n\n## Decisión\nSe seleccionará **Monolitico modular** junto a **Layered Architecture**.\n\n## Justificación\nEl monolitico modular es una arquitectura donde toda la aplicación se despliega \ncomo una sola unidad (un solo artefacto/proceso), pero el código interno está \nestrictamente organizado en módulos de bajo acomplamiento basados en el dominio \ndel negocio permitiendo que si se necesita escalar un modulo se puede convertir \nen un microservicio, gracias a que sigue siendo un monolito es mas simple para \nun equipo pequeño, a diferencia de microservicios que requieren mas experiencia \ny mas tiempo para implementar, pero seguimos conservando la ventaja de modulos \ncon bajo acomplamiento. Ademas es optima para un equipo pequeño. Tambien debido \nal tamaño del equipo y del proyecto se escogera Layered Architecture ya que \nofrece una forma simple de organizar el codigo. Se encontrara dentro de cada \nmodulo(repository.py, router.py, service.py) y db.py como capa de infraestructura \ncompartida. Modelos pydantic (schemas.py) y tablas de SQLModel(models.py) en \ncada módulo correspodiente.\n\n### Consecuencias\n* **Positivas:** El desarrollador cuenta con experiencia trabajando con esta arquitectura, ademas layered encaja muy bien con FastAPI.\n* **Negativas:** Disciplina: Requiere madurez. Es muy fácil hacer trampa e importar código cruzado si no hay reglas de linter estrictas. \n* **Mitigacion:** La comunicación entre módulos se realizará mediante llamadas a métodos públicos (interfaces de servicio) y no mediante consultas directas a tablas de otros módulos.\n",
+          "date" : "2025-12-23T15:55:38Z",
           "format" : "Markdown",
           "id" : "3",
           "status" : "Proposed",
           "title" : " Selección de Estilo(Macro arquitectónico) y Patron Arquitectónico(Micro arquitectónico)"
+        }, {
+          "content" : "# 4. Estrategia de Autenticación y Seguridad\n\n**Fecha:** 2025-12-23\n**Estado:** Aceptado\n\n## Contexto\nEl sistema requiere identificar a los administradores y clientes de forma segura. Se necesita un mecanismo para mantener la sesión del usuario entre peticiones de forma eficiente (stateless vs stateful) y una forma robusta de almacenar credenciales, ya que almacenar contraseñas en texto plano es inaceptable.\n\n## Decisiones\n\n### 1. Mecanismo de Sesión: JWT (JSON Web Tokens)\nSe utilizará el esquema de autenticación **Bearer Token** con **JWT**.\n* **Justificación:** Permite que la API sea completamente *stateless* (sin guardar sesiones en memoria o BD), lo que facilita el escalado horizontal.\n* **Implementación:** FastAPI gestionará la seguridad de los endpoints mediante `HTTPBearer`, validando la firma del token en cada petición protegida.\n\n### 2. Almacenamiento de Contraseñas: Hashing con Argon2\nSe utilizará el algoritmo **Argon2** (vía librería `passlib`).\n* **Justificación:** Argon2 es el ganador de la *Password Hashing Competition*. Es resistente a ataques de fuerza bruta por GPU/ASIC, siendo superior a estándares antiguos como SHA256 o MD5.\n\n### 3. Librería de Criptografía: PyJWT\nSe utilizará **PyJWT** para la generación (codificación) y validación (decodificación) de los tokens.\n\n## Consecuencias\n* **Responsabilidad del Cliente:** El frontend (o cliente API) debe encargarse de almacenar el token de forma segura y enviarlo en el header `Authorization` en cada petición.",
+          "date" : "2025-12-23T15:55:38Z",
+          "format" : "Markdown",
+          "id" : "4",
+          "status" : "Proposed",
+          "title" : "Estrategia de Autenticación y Seguridad"
         } ],
         "sections" : [ {
           "content" : "# Modelo de Datos (Iteración 1: Autenticación)\n\n**Nota de Diseño:** Se utiliza UUIDv7 para la Clave Primaria. Esto permite mantener la base de datos indexada eficientemente por tiempo, evitando la fragmentación que producen los UUIDv4 aleatorios.\n\n```mermaid\nerDiagram\n    users {\n        UUID id PK \"UUIDv7 (Time-sortable)\"\n        VARCHAR email UK \"Unique, Not Null\"\n        VARCHAR hashed_password \"Not Null\"\n        VARCHAR role \"Default: 'client'\"\n        BOOLEAN is_active \"Default: true\"\n        TIMESTAMP created_at \"Default: now()\"\n    }",
@@ -166,7 +180,7 @@
   },
   "name" : "Name",
   "properties" : {
-    "structurizr.dsl" : "d29ya3NwYWNlIHsKCiAgICBtb2RlbCB7CiAgICAgICAgIyAtLS0gQWN0b3JlcyAtLS0KICAgICAgICBjbGllbnRlID0gcGVyc29uICJDbGllbnRlIiAiUGVyc29uYSBpbnRlcmVzYWRhIGVuIGFybWFyIG8gbWVqb3JhciBzdSBQQy4iCiAgICAgICAgYWRtaW4gPSBwZXJzb24gIkFkbWluaXN0cmFkb3IiICJHZXN0aW9uYSBlbCBzdG9jayB5IGxvcyBwcmVjaW9zIGRlIGNvbXBvbmVudGVzLiIKCiAgICAgICAgIyAtLS0gVHUgU2lzdGVtYSAtLS0KICAgICAgICBlY29tbWVyY2UgPSBzb2Z0d2FyZVN5c3RlbSAiQkVHYW1lciBDb21wb25lbnRzIiAiUGxhdGFmb3JtYSBwYXJhIGJ1c2NhciwgY29tcGFyYXIgeSBjb21wcmFyIGhhcmR3YXJlLiIgewogICAgICAgICAgICAjIExlIGRpY2UgYSBTdHJ1Y3R1cml6ciBxdWUgYnVzcXVlIGxhIGRvY3VtZW50YWNpw7NuIGRlbnRybyBkZSBlc3RhcyBjYXJwZXRhcwogICAgICAgICAgICAhZG9jcyBkb2NzCiAgICAgICAgICAgICFhZHJzIGFkcnMKICAgICAgICAgICAgYXBpID0gY29udGFpbmVyICJBUEkgQmFja2VuZCIgIk1hbmVqYSBsYSBhdXRlbnRpY2FjacOzbiAoTG9naW4pIHkgbMOzZ2ljYSBkZSBuZWdvY2lvLiIgIlB5dGhvbiAzLjExICsgRmFzdEFQSSIgewogICAgICAgICAgICAgICAgdGFncyAiQVBJIgogICAgICAgICAgICB9CgogICAgICAgICAgICBkYXRhYmFzZSA9IGNvbnRhaW5lciAiQmFzZSBkZSBEYXRvcyIgIkFsbWFjZW5hIHVzdWFyaW9zLCByb2xlcyB5IGhhc2hlcyBkZSBjb250cmFzZcOxYXMuIiAiUG9zdGdyZVNRTCAxNiIgewogICAgICAgICAgICAgICAgdGFncyAiRGF0YWJhc2UiCiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgICMgLS0tIFNpc3RlbWFzIEV4dGVybm9zIC0tLQogICAgICAgIHdlYnBheSA9IHNvZnR3YXJlU3lzdGVtICJQYXNhcmVsYSBkZSBQYWdvcyAoU2FuZGJveCkiICJHZXN0aW9uYSB0cmFuc2FjY2lvbmVzIGJhbmNhcmlhcyBlbiBhbWJpZW50ZSBkZSBwcnVlYmFzLiIgIkV4dGVybmFsIFN5c3RlbSIKICAgICAgICAKICAgICAgICBzaWkgPSBzb2Z0d2FyZVN5c3RlbSAiU2VydmljaW8gSW1wdWVzdG9zIEludGVybm9zIChNb2NrKSIgIlNpbXVsYSBsYSB2YWxpZGFjacOzbiB5IGVtaXNpw7NuIGRlIGJvbGV0YXMgcGFyYSBmaW5lcyBhY2Fkw6ltaWNvcy4iICJFeHRlcm5hbCBTeXN0ZW0iCiAgICAgICAgZW1haWxfc3lzdGVtID0gc29mdHdhcmVTeXN0ZW0gIlNpc3RlbWEgZGUgQ29ycmVvIiAiRW52w61hIGNvbmZpcm1hY2lvbmVzIGRlIMOzcmRlbmVzIHkgcmVjdXBlcmFjacOzbiBkZSBjbGF2ZXMuIiAiRXh0ZXJuYWwgU3lzdGVtIgogICAKICAgICAgICAjIC0tLSBSZWxhY2lvbmVzIC0tLQogICAgICAgIGNsaWVudGUgLT4gZWNvbW1lcmNlICJCdXNjYSBjb21wb25lbnRlcyB5IGNvbXByYSIKICAgICAgICBhZG1pbiAtPiBlY29tbWVyY2UgIkdlc3Rpb25hIGludmVudGFyaW8iCiAgICAgICAgCiAgICAgICAgZWNvbW1lcmNlIC0+IHdlYnBheSAiSW5pY2lhIHRyYW5zYWNjacOzbiB5IHZhbGlkYSBlc3RhZG8iCiAgICAgICAgZWNvbW1lcmNlIC0+IHNpaSAiU29saWNpdGEgZm9saW8geSB0aW1icmUgZWxlY3Ryw7NuaWNvIChTaW11bGFkbykiCiAgICAgICAgZWNvbW1lcmNlIC0+IGVtYWlsX3N5c3RlbSAiRW52w61hIGNvcnJlb3MgZWxlY3Ryw7NuaWNvcyBhIGNsaWVudGVzIgogICAgICAgICMgMS4gRWwgQWRtaW4gaW50ZW50YSBlbnRyYXIKICAgICAgICBhZG1pbiAtPiBhcGkgIkVudsOtYSBjcmVkZW5jaWFsZXMgKFBPU1QgL2F1dGgvbG9naW4pIiAiSFRUUFMvSlNPTiIKICAgICAgICAKICAgICAgICAjIDIuIExhIEFQSSB2ZXJpZmljYSBxdWnDqW4gZXMKICAgICAgICBhcGkgLT4gZGF0YWJhc2UgIlNlbGVjY2lvbmEgdXN1YXJpbyB5IGhhc2ggZGUgY29udHJhc2XDsWEiICJTUUwvU1FMQWxjaGVteSIKCgogICAgfQoKICAgIHZpZXdzIHsKICAgICAgICBzeXN0ZW1Db250ZXh0IGVjb21tZXJjZSAiRGlhZ3JhbWFDb250ZXh0byIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgYXV0b2xheW91dCBscgogICAgICAgICAgICB0aXRsZSAiRGlhZ3JhbWEgZGUgQ29udGV4dG8gLSBWZW50YSBkZSBQQyAoRW50b3JubyBBY2Fkw6ltaWNvKSIKICAgICAgICB9CiAgICAgICAgIyBWaXN0YSBOaXZlbCAyIChDb250ZW5lZG9yZXMpCiAgICAgICAgY29udGFpbmVyIGVjb21tZXJjZSAiQ29udGVuZWRvcmVzIiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBhdXRvbGF5b3V0IGxyCiAgICAgICAgICAgIHRpdGxlICJOaXZlbCAyOiBDb250ZW5lZG9yZXMgKEZvY286IEF1dGVudGljYWNpw7NuKSIKICAgICAgICB9CiAgICAgICAgCiAgICAgICAgc3R5bGVzIHsKICAgICAgICAgICAgZWxlbWVudCAiUGVyc29uIiB7CiAgICAgICAgICAgICAgICBzaGFwZSBQZXJzb24KICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzA4NDI3YgogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIlNvZnR3YXJlIFN5c3RlbSIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjMTE2OGJkCiAgICAgICAgICAgICAgICBjb2xvciAjZmZmZmZmCiAgICAgICAgICAgIH0KICAgICAgICAgICAgIyBFc3RpbG8gcGFyYSBzaXN0ZW1hcyBleHRlcm5vcyByZWFsZXMgbyBzaW11bGFkb3MKICAgICAgICAgICAgZWxlbWVudCAiRXh0ZXJuYWwgU3lzdGVtIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICM5OTk5OTkKICAgICAgICAgICAgICAgIGNvbG9yICNmZmZmZmYKICAgICAgICAgICAgfQogICAgICAgICAgICAjIEVzdGlsbyB2aXN1YWwgcGFyYSBkaWZlcmVuY2lhciBBUEkgZGUgQmFzZSBkZSBEYXRvcwogICAgICAgICAgICBlbGVtZW50ICJBUEkiIHsKICAgICAgICAgICAgICAgIHNoYXBlIFJvdW5kZWRCb3gKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzQzOGRkNQogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIkRhdGFiYXNlIiB7CiAgICAgICAgICAgICAgICBzaGFwZSBDeWxpbmRlcgogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjMjU1ZmExCiAgICAgICAgICAgICAgICBjb2xvciAjZmZmZmZmCiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9Cn0="
+    "structurizr.dsl" : "d29ya3NwYWNlIHsKCiAgICBtb2RlbCB7CiAgICAgICAgIyAtLS0gQWN0b3JlcyAtLS0KICAgICAgICBjbGllbnRlID0gcGVyc29uICJDbGllbnRlIiAiUGVyc29uYSBpbnRlcmVzYWRhIGVuIGFybWFyIG8gbWVqb3JhciBzdSBQQy4iCiAgICAgICAgYWRtaW4gPSBwZXJzb24gIkFkbWluaXN0cmFkb3IiICJHZXN0aW9uYSBlbCBzdG9jayB5IGxvcyBwcmVjaW9zIGRlIGNvbXBvbmVudGVzLiIKCiAgICAgICAgIyAtLS0gVHUgU2lzdGVtYSAtLS0KICAgICAgICBlY29tbWVyY2UgPSBzb2Z0d2FyZVN5c3RlbSAiQkVHYW1lciBDb21wb25lbnRzIiAiUGxhdGFmb3JtYSBwYXJhIGJ1c2NhciwgY29tcGFyYXIgeSBjb21wcmFyIGhhcmR3YXJlLiIgewogICAgICAgICAgICAjIExlIGRpY2UgYSBTdHJ1Y3R1cml6ciBxdWUgYnVzcXVlIGxhIGRvY3VtZW50YWNpw7NuIGRlbnRybyBkZSBlc3RhcyBjYXJwZXRhcwogICAgICAgICAgICAhZG9jcyBkb2NzCiAgICAgICAgICAgICFhZHJzIGFkcnMKICAgICAgICAgICAgYXBpID0gY29udGFpbmVyICJBUEkgQmFja2VuZCIgIk1hbmVqYSBsYSBhdXRlbnRpY2FjacOzbiAoTG9naW4pIHkgYXV0b3JpemFjacOzbi4iICJQeXRob24gMy4xMSBzbGltICsgRmFzdEFQSSIgewogICAgICAgICAgICAgICAgdGFncyAiQVBJIgogICAgICAgICAgICB9CgogICAgICAgICAgICBkYXRhYmFzZSA9IGNvbnRhaW5lciAiQmFzZSBkZSBEYXRvcyIgIkFsbWFjZW5hIHVzdWFyaW9zLCByb2xlcyB5IGhhc2hlcyBkZSBjb250cmFzZcOxYXMuIiAiUG9zdGdyZVNRTCAxNS1hbHBpbmUiIHsKICAgICAgICAgICAgICAgIHRhZ3MgIkRhdGFiYXNlIgogICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICAjIC0tLSBTaXN0ZW1hcyBFeHRlcm5vcyAtLS0KICAgICAgICB3ZWJwYXkgPSBzb2Z0d2FyZVN5c3RlbSAiUGFzYXJlbGEgZGUgUGFnb3MgKFNhbmRib3gpIiAiR2VzdGlvbmEgdHJhbnNhY2Npb25lcyBiYW5jYXJpYXMgZW4gYW1iaWVudGUgZGUgcHJ1ZWJhcy4iICJFeHRlcm5hbCBTeXN0ZW0iCiAgICAgICAgCiAgICAgICAgc2lpID0gc29mdHdhcmVTeXN0ZW0gIlNlcnZpY2lvIEltcHVlc3RvcyBJbnRlcm5vcyAoTW9jaykiICJTaW11bGEgbGEgdmFsaWRhY2nDs24geSBlbWlzacOzbiBkZSBib2xldGFzIHBhcmEgZmluZXMgYWNhZMOpbWljb3MuIiAiRXh0ZXJuYWwgU3lzdGVtIgogICAgICAgIGVtYWlsX3N5c3RlbSA9IHNvZnR3YXJlU3lzdGVtICJTaXN0ZW1hIGRlIENvcnJlbyIgIkVudsOtYSBjb25maXJtYWNpb25lcyBkZSDDs3JkZW5lcyB5IHJlY3VwZXJhY2nDs24gZGUgY2xhdmVzLiIgIkV4dGVybmFsIFN5c3RlbSIKICAgCiAgICAgICAgIyAtLS0gUmVsYWNpb25lcyAtLS0KICAgICAgICBjbGllbnRlIC0+IGVjb21tZXJjZSAiQnVzY2EgY29tcG9uZW50ZXMgeSBjb21wcmEiCiAgICAgICAgYWRtaW4gLT4gZWNvbW1lcmNlICJHZXN0aW9uYSBpbnZlbnRhcmlvIgogICAgICAgIAogICAgICAgIGVjb21tZXJjZSAtPiB3ZWJwYXkgIkluaWNpYSB0cmFuc2FjY2nDs24geSB2YWxpZGEgZXN0YWRvIgogICAgICAgIGVjb21tZXJjZSAtPiBzaWkgIlNvbGljaXRhIGZvbGlvIHkgdGltYnJlIGVsZWN0csOzbmljbyAoU2ltdWxhZG8pIgogICAgICAgIGVjb21tZXJjZSAtPiBlbWFpbF9zeXN0ZW0gIkVudsOtYSBjb3JyZW9zIGVsZWN0csOzbmljb3MgYSBjbGllbnRlcyIKICAgICAgICAjIDEuIEVsIEFkbWluIGludGVudGEgZW50cmFyCiAgICAgICAgYWRtaW4gLT4gYXBpICJJbnRlcmFjdMO6YSB2w61hIFN3YWdnZXIgVUkgcGFyYSBlbnZpYXIgY3JlZGVuY2lhbGVzIGNvbiByb2wgZGUgYWRtaW5pc3RyYWRvciIgIkhUVFBTL0pTT04iCiAgICAgICAgY2xpZW50ZSAtPiBhcGkgIkludGVyYWN0w7phIHbDrWEgU3dhZ2dlciBVSSBwYXJhIGVudmlhciBjcmVkZW5jaWFsZXMgY29uIHJvbCBkZSBjbGllbnQiICJIVFRQUy9KU09OIgogICAgICAgIAogICAgICAgICMgMi4gTGEgQVBJIHZlcmlmaWNhIHF1acOpbiBlcwogICAgICAgIGFwaSAtPiBkYXRhYmFzZSAiU2VsZWNjaW9uYSB1c3VhcmlvIHkgaGFzaCBkZSBjb250cmFzZcOxYSIgIlNRTC9TUUxNb2RlbCIKCgogICAgfQoKICAgIHZpZXdzIHsKICAgICAgICBzeXN0ZW1Db250ZXh0IGVjb21tZXJjZSAiRGlhZ3JhbWFDb250ZXh0byIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgYXV0b2xheW91dCBscgogICAgICAgICAgICB0aXRsZSAiRGlhZ3JhbWEgZGUgQ29udGV4dG8gLSBWZW50YSBkZSBQQyAoRW50b3JubyBBY2Fkw6ltaWNvKSIKICAgICAgICB9CiAgICAgICAgIyBWaXN0YSBOaXZlbCAyIChDb250ZW5lZG9yZXMpCiAgICAgICAgY29udGFpbmVyIGVjb21tZXJjZSAiQ29udGVuZWRvcmVzIiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBhdXRvbGF5b3V0IGxyCiAgICAgICAgICAgIHRpdGxlICJOaXZlbCAyOiBDb250ZW5lZG9yZXMgKEZvY286IEF1dGVudGljYWNpw7NuKSIKICAgICAgICB9CiAgICAgICAgCiAgICAgICAgc3R5bGVzIHsKICAgICAgICAgICAgZWxlbWVudCAiUGVyc29uIiB7CiAgICAgICAgICAgICAgICBzaGFwZSBQZXJzb24KICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzA4NDI3YgogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIlNvZnR3YXJlIFN5c3RlbSIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjMTE2OGJkCiAgICAgICAgICAgICAgICBjb2xvciAjZmZmZmZmCiAgICAgICAgICAgIH0KICAgICAgICAgICAgIyBFc3RpbG8gcGFyYSBzaXN0ZW1hcyBleHRlcm5vcyByZWFsZXMgbyBzaW11bGFkb3MKICAgICAgICAgICAgZWxlbWVudCAiRXh0ZXJuYWwgU3lzdGVtIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICM5OTk5OTkKICAgICAgICAgICAgICAgIGNvbG9yICNmZmZmZmYKICAgICAgICAgICAgfQogICAgICAgICAgICAjIEVzdGlsbyB2aXN1YWwgcGFyYSBkaWZlcmVuY2lhciBBUEkgZGUgQmFzZSBkZSBEYXRvcwogICAgICAgICAgICBlbGVtZW50ICJBUEkiIHsKICAgICAgICAgICAgICAgIHNoYXBlIFJvdW5kZWRCb3gKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzQzOGRkNQogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIkRhdGFiYXNlIiB7CiAgICAgICAgICAgICAgICBzaGFwZSBDeWxpbmRlcgogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjMjU1ZmExCiAgICAgICAgICAgICAgICBjb2xvciAjZmZmZmZmCiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9Cn0="
   },
   "views" : {
     "configuration" : {
@@ -210,6 +224,10 @@
         "vertices" : false
       },
       "elements" : [ {
+        "id" : "1",
+        "x" : 0,
+        "y" : 0
+      }, {
         "id" : "2",
         "x" : 0,
         "y" : 0
@@ -229,6 +247,8 @@
         "id" : "14"
       }, {
         "id" : "15"
+      }, {
+        "id" : "16"
       } ],
       "softwareSystemId" : "3",
       "title" : "Nivel 2: Contenedores (Foco: Autenticación)"

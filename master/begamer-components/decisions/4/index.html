@@ -51,31 +51,27 @@
           </ul>
         </div>
         <div class="content p-3">
-          <div><h1>Selección de Motor de Base de Datos Principal y ORM</h1>
-<ul>
- <li><strong>Estado:</strong> Aceptado</li>
- <li><strong>Fecha:</strong> 2025-12-09</li>
-</ul>
+          <div><h1>4. Estrategia de Autenticación y Seguridad</h1>
+<p><strong>Fecha:</strong> 2025-12-23 <strong>Estado:</strong> Aceptado</p>
 <h2>Contexto</h2>
-<p>El sistema de e-commerce "BEGamer Components" requiere almacenar información de productos, usuarios, inventario y órdenes de compra. La integridad de los datos en las órdenes y el inventario es crítica (no podemos vender stock que no existe).</p>
-<h2>Opciones Consideradas como motor</h2>
+<p>El sistema requiere identificar a los administradores y clientes de forma segura. Se necesita un mecanismo para mantener la sesión del usuario entre peticiones de forma eficiente (stateless vs stateful) y una forma robusta de almacenar credenciales, ya que almacenar contraseñas en texto plano es inaceptable.</p>
+<h2>Decisiones</h2>
+<h3>1. Mecanismo de Sesión: JWT (JSON Web Tokens)</h3>
+<p>Se utilizará el esquema de autenticación <strong>Bearer Token</strong> con <strong>JWT</strong>.</p>
 <ul>
- <li>PostgreSQL</li>
- <li>SQLite</li>
+ <li><strong>Justificación:</strong> Permite que la API sea completamente <em>stateless</em> (sin guardar sesiones en memoria o BD), lo que facilita el escalado horizontal.</li>
+ <li><strong>Implementación:</strong> FastAPI gestionará la seguridad de los endpoints mediante <code>HTTPBearer</code>, validando la firma del token en cada petición protegida.</li>
 </ul>
-<h2>ORM</h2>
+<h3>2. Almacenamiento de Contraseñas: Hashing con Argon2</h3>
+<p>Se utilizará el algoritmo <strong>Argon2</strong> (vía librería <code>passlib</code>).</p>
 <ul>
- <li>SQLModel</li>
+ <li><strong>Justificación:</strong> Argon2 es el ganador de la <em>Password Hashing Competition</em>. Es resistente a ataques de fuerza bruta por GPU/ASIC, siendo superior a estándares antiguos como SHA256 o MD5.</li>
 </ul>
-<h2>Decisión</h2>
-<p>Se seleccionará <strong>PostgreSQL</strong> junto a <strong>SQLModel</strong>.</p>
-<h2>Justificación</h2>
-<p>Al ser un e-commerce, la relación entre tablas (Usuario -&gt; Orden -&gt; Detalle -&gt; Producto) es fuerte. Se necesitan transacciones ACID para asegurar que al comprar, se descuente el stock inmediatamente. PostgreSQL ofrece esto y además tiene buen soporte para JSON si se necesita guardar especificaciones técnicas flexibles de los PC. Para el ORM SQLModel es excelente considerando que se trabaja con FastAPI, ya que ofrece la validación de datos de Pydantic y la definición de tablas como modelos entre otras cosas, usando SQLAlchemy por debajo.</p>
-<h3>Consecuencias</h3>
+<h3>3. Librería de Criptografía: PyJWT</h3>
+<p>Se utilizará <strong>PyJWT</strong> para la generación (codificación) y validación (decodificación) de los tokens.</p>
+<h2>Consecuencias</h2>
 <ul>
- <li><strong>Positivas:</strong> Integridad referencial fuerte. Stack tecnológico alineado con el mercado laboral enterprise, desarrollador con experiencia en PostgreSQL. SQLModel creado por el mismo creador de FastAPI otorgando amplia compatibilidad y funcionamiento.</li>
- <li><strong>Negativas:</strong> Requiere definir esquemas (migrations) antes de programar, y una configuracion adicional para la base de datos PostgreSQL. Ademas de que se necesitaran usar librerias asincronas para compatibilidad con la app FastAPI asincrona.</li>
- <li><strong>Mitigacion:</strong> Configurar la base de datos mediante docker y diagramar la base de datos con diagrama ER, usar librerias asincronas como asyncpg y librerias de SQLAlchemy para manejar correctamente async.</li>
+ <li><strong>Responsabilidad del Cliente:</strong> El frontend (o cliente API) debe encargarse de almacenar el token de forma segura y enviarlo en el header <code>Authorization</code> en cada petición.</li>
 </ul></div>
         </div>
       </div>
