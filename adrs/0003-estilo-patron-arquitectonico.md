@@ -19,7 +19,19 @@ El sistema de e-commerce "BEGamer Components" requiere un estilo y patrones arqu
 Se seleccionará **Monolitico modular** junto a **Layered Architecture**.
 
 ## Justificación
-El monolitico modular es una arquitectura donde toda la aplicación se despliega como una sola unidad (un solo artefacto/proceso), pero el código interno está estrictamente organizado en módulos de bajo acomplamiento basados en el dominio del negocio permitiendo que si se necesita escalar un modulo se puede convertir en un microservicio, gracias a que sigue siendo un monolito es mas simple para un equipo pequeño, a diferencia de microservicios que requieren mas experiencia y mas tiempo para implementar, pero seguimos conservando la ventaja de modulos con bajo acomplamiento. Ademas es optima para un equipo pequeño. Tambien debido al tamaño del equipo y del proyecto se escogera Layered Architecture ya que ofrece una forma simple de organizar el codigo. Se encontrara dentro de cada modulo(repository.py, router.py, service.py) y db.py como capa de infraestructura compartida.
+El monolitico modular es una arquitectura donde toda la aplicación se despliega 
+como una sola unidad (un solo artefacto/proceso), pero el código interno está 
+estrictamente organizado en módulos de bajo acomplamiento basados en el dominio 
+del negocio permitiendo que si se necesita escalar un modulo se puede convertir 
+en un microservicio, gracias a que sigue siendo un monolito es mas simple para 
+un equipo pequeño, a diferencia de microservicios que requieren mas experiencia 
+y mas tiempo para implementar, pero seguimos conservando la ventaja de modulos 
+con bajo acomplamiento. Ademas es optima para un equipo pequeño. Tambien debido 
+al tamaño del equipo y del proyecto se escogera Layered Architecture ya que 
+ofrece una forma simple de organizar el codigo. Se encontrara dentro de cada 
+modulo(repository.py, router.py, service.py) y db.py como capa de infraestructura 
+compartida. Modelos pydantic (schemas.py) y tablas de SQLModel(models.py) en 
+cada módulo correspodiente.
 
 ### Consecuencias
 * **Positivas:** El desarrollador cuenta con experiencia trabajando con esta arquitectura, ademas layered encaja muy bien con FastAPI.

@@ -10,11 +10,11 @@ workspace {
             # Le dice a Structurizr que busque la documentación dentro de estas carpetas
             !docs docs
             !adrs adrs
-            api = container "API Backend" "Maneja la autenticación (Login) y lógica de negocio." "Python 3.11 + FastAPI" {
+            api = container "API Backend" "Maneja la autenticación (Login) y autorización." "Python 3.11 slim + FastAPI" {
                 tags "API"
             }
 
-            database = container "Base de Datos" "Almacena usuarios, roles y hashes de contraseñas." "PostgreSQL 16" {
+            database = container "Base de Datos" "Almacena usuarios, roles y hashes de contraseñas." "PostgreSQL 15-alpine" {
                 tags "Database"
             }
         }
@@ -33,10 +33,11 @@ workspace {
         ecommerce -> sii "Solicita folio y timbre electrónico (Simulado)"
         ecommerce -> email_system "Envía correos electrónicos a clientes"
         # 1. El Admin intenta entrar
-        admin -> api "Envía credenciales (POST /auth/login)" "HTTPS/JSON"
+        admin -> api "Interactúa vía Swagger UI para enviar credenciales con rol de administrador" "HTTPS/JSON"
+        cliente -> api "Interactúa vía Swagger UI para enviar credenciales con rol de client" "HTTPS/JSON"
         
         # 2. La API verifica quién es
-        api -> database "Selecciona usuario y hash de contraseña" "SQL/SQLAlchemy"
+        api -> database "Selecciona usuario y hash de contraseña" "SQL/SQLModel"
 
 
     }
