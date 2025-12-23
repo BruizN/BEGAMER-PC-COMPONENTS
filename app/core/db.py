@@ -12,8 +12,6 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 
-#Modelos(tablas)
-
 
 #Dependencia de sesiones
 async def get_db():
