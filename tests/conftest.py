@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 import pytest
 from typing import AsyncGenerator
 from httpx import AsyncClient, ASGITransport
@@ -6,10 +8,13 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 
 from app.main import app
 from app.core.db import get_db 
-from app.core.config import settings
 
+load_dotenv()
 
-TEST_DATABASE_URL = f"postgresql+asyncpg://{settings.postgres_user}:{settings.postgres_password}@localhost:5433/begamer_test"
+TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
+
+if not TEST_DATABASE_URL:
+    raise ValueError("❌ ERROR: No se encontró la variable TEST_DATABASE_URL. Revisa tu .env o tu CI.")
 
 
 test_engine = create_async_engine(TEST_DATABASE_URL, echo=False, future=True)
