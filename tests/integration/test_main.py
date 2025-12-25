@@ -1,5 +1,5 @@
-def test_enpoint_raiz(client):
-    response = client.get("/health")
+async def test_endpoint_health(client):
+    response = await client.get("/health")
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
