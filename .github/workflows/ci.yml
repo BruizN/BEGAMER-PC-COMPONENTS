@@ -47,7 +47,7 @@ jobs:
         env:
           POSTGRES_USER: ${{ secrets.TEST_DB_USER }}
           POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
-          POSTGRES_URL: postgresql+asyncpg://${{ secrets.TEST_DB_USER }}:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/begamer_test
+          POSTGRES_URL: postgresql+asyncpg://${{ secrets.TEST_DB_USER }}:${{ secrets.TEST_DB_PASSWORD }}@localhost:5433/begamer_test
           SECRET_KEY: ${{ secrets.TEST_SECRET_KEY }}
           ALGORITHM: "HS256"
           ACCESS_TOKEN_EXPIRE_MINUTES: 30
