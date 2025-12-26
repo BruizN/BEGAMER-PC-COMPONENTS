@@ -12,6 +12,7 @@ from app.core.config import settings
 from sqlmodel import SQLModel
 
 # Modelos 
+from app.modules.auth.models import User
 
 config = context.config
 
@@ -73,7 +74,7 @@ async def run_migrations_online() -> None:
     )
 
     async with connectable.connect() as connection:
-        # Alembic es síncrono por dentro, así que usamos run_sync
+        # Alembic es síncrono por dentro, así que se usa run_sync
         await connection.run_sync(do_run_migrations)
 
     await connectable.dispose()
