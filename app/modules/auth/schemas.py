@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel
-from pydantic import SecretStr, field_validator, Field, EmailStr, BaseModel
+from pydantic import SecretStr, Field, EmailStr, BaseModel
 
 
 
