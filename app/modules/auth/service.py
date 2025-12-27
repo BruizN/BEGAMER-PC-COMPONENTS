@@ -13,6 +13,6 @@ async def login_user(session: AsyncSession, email: EmailStr, password: SecretStr
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials"
             )
-    return create_access_token(data={"sub": str(user.id), "role": user.role})
+    return create_access_token(data={"sub": str(user.user_id), "role": user.role})
 
     
