@@ -1,6 +1,4 @@
-from fastapi import Depends, APIRouter
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Annotated
+from fastapi import APIRouter
 from app.modules.auth.schemas import TokenOut, LoginRequest
 from app.core.dependencies import SessionDep #Dependencia de sesion asincrona
 from app.modules.auth.service import login_user
