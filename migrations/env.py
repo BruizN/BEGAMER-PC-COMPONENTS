@@ -12,7 +12,7 @@ from app.core.config import settings
 from sqlmodel import SQLModel
 
 # Modelos 
-from app.modules.auth.models import User
+from app.modules.auth.models import User # noqa: F401
 
 config = context.config
 
