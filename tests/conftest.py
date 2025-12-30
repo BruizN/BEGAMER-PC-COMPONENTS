@@ -4,10 +4,14 @@ import pytest
 from typing import AsyncGenerator
 from httpx import AsyncClient, ASGITransport
 from sqlmodel import SQLModel
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 
 from app.main import app
 from app.core.db import get_db 
+from app.core.security import hash_password
+from app.modules.auth.models import User
 
 load_dotenv()
 
@@ -17,34 +21,32 @@ if not TEST_DATABASE_URL:
     raise ValueError("❌ ERROR: No se encontró la variable TEST_DATABASE_URL. Revisa tu .env o tu CI.")
 
 
-test_engine = create_async_engine(TEST_DATABASE_URL, echo=False, future=True)
+@pytest.fixture(scope="session")
+def engine():
+    return create_async_engine(TEST_DATABASE_URL, echo=False, future=True)
 
+@pytest.fixture(scope="session")
+def async_session_factory(engine):
+    return async_sessionmaker(
+        bind=engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+        autoflush=False
+    )
 
-TestAsyncSessionLocal = async_sessionmaker(
-    bind=test_engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-    autoflush=False
-)
-
-# Setup de la Base de Datos 
 @pytest.fixture(scope="session", autouse=True)
-async def setup_test_db():
-    async with test_engine.begin() as conn:
-        # Limpia por si acaso quedó basura de antes
+async def setup_test_db(engine):
+    async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.drop_all)
-        # Crea todas las tablas
         await conn.run_sync(SQLModel.metadata.create_all)
     yield
-    # Al terminar todos los tests, borra todo
-    async with test_engine.begin() as conn:
+    async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.drop_all)
-    await test_engine.dispose()
+    await engine.dispose()
 
-# Fixture de Sesión 
 @pytest.fixture(scope="function")
-async def db_session() -> AsyncGenerator[AsyncSession, None]:
-    async with TestAsyncSessionLocal() as session:
+async def db_session(async_session_factory) -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_factory() as session:
         yield session
 
 # Fixture del Cliente
@@ -62,3 +64,21 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
         yield c
 
     app.dependency_overrides.clear()
+
+@pytest.fixture
+async def test_user(db_session):
+    password_raw = "password_segura_123"
+    hashed = hash_password(password_raw)
+
+    new_user = User(
+        email="usuario_test@ejemplo.com",
+        hashed_password=hashed,
+        role="client",
+        is_active=True
+    )
+
+    db_session.add(new_user)
+    await db_session.commit()
+    await db_session.refresh(new_user)
+
+    return {"user": new_user, "password": password_raw}
