@@ -4,10 +4,14 @@ import pytest
 from typing import AsyncGenerator
 from httpx import AsyncClient, ASGITransport
 from sqlmodel import SQLModel
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 
 from app.main import app
 from app.core.db import get_db 
+from app.core.security import hash_password
+from app.modules.auth.models import User
 
 load_dotenv()
 
@@ -26,6 +30,8 @@ TestAsyncSessionLocal = async_sessionmaker(
     expire_on_commit=False,
     autoflush=False
 )
+
+
 
 # Setup de la Base de Datos 
 @pytest.fixture(scope="session", autouse=True)
@@ -62,3 +68,21 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
         yield c
 
     app.dependency_overrides.clear()
+
+@pytest.fixture
+async def test_user(db_session):
+    password_raw = "password_segura_123"
+    hashed = hash_password(password_raw)
+
+    new_user = User(
+        email="usuario_test@ejemplo.com",
+        hashed_password=hashed,
+        role="client",
+        is_active=True
+    )
+
+    db_session.add(new_user)
+    await db_session.commit()
+    await db_session.refresh(new_user)
+
+    return {"user": new_user, "password": password_raw}
