@@ -10,5 +10,4 @@ erDiagram
         VARCHAR hashed_password "Not Null"
         VARCHAR role "Default: 'client'"
         BOOLEAN is_active "Default: true"
-        TIMESTAMP created_at "Default: now()"
     }

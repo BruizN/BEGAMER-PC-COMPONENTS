@@ -1,4 +1,4 @@
-# Selección de Motor de Base de Datos Principal y ORM
+# Selección de Motor de Base de Datos Principal, ORM y gestor de migraciones
 
 * **Estado:** Aceptado
 * **Fecha:** 2025-12-09
@@ -15,13 +15,13 @@ El sistema de e-commerce "BEGamer Components" requiere almacenar información de
 * SQLModel
 
 ## Decisión
-Se seleccionará **PostgreSQL** junto a **SQLModel**.
+Se seleccionará **PostgreSQL** junto a **SQLModel** y **Alembic**.
 
 ## Justificación
 Al ser un e-commerce, la relación entre tablas (Usuario -> Orden -> Detalle -> Producto) es fuerte. Se necesitan transacciones ACID para asegurar que al comprar, se descuente el stock inmediatamente. PostgreSQL ofrece esto y además tiene buen soporte para JSON si se necesita guardar especificaciones técnicas flexibles de los PC. Para el ORM SQLModel es excelente considerando que se trabaja con FastAPI, ya que 
-ofrece la validación de datos de Pydantic y la definición de tablas como modelos entre otras cosas, usando SQLAlchemy por debajo.
+ofrece la validación de datos de Pydantic y la definición de tablas como modelos entre otras cosas, usando SQLAlchemy por debajo. Se usará Alembic para la gestión de migraciones de la base de datos ya que es el éstandar junto a SQLModel/SQLAlchemy
 
 ### Consecuencias
 * **Positivas:** Integridad referencial fuerte. Stack tecnológico alineado con el mercado laboral enterprise, desarrollador con experiencia en PostgreSQL. SQLModel creado por el mismo creador de FastAPI otorgando amplia compatibilidad y funcionamiento.
 * **Negativas:** Requiere definir esquemas (migrations) antes de programar, y una configuracion adicional para la base de datos PostgreSQL. Ademas de que se necesitaran usar librerias asincronas para compatibilidad con la app FastAPI asincrona.
-* **Mitigacion:** Configurar la base de datos mediante docker y diagramar la base de datos con diagrama ER, usar librerias asincronas como asyncpg y librerias de SQLAlchemy para manejar correctamente async.
+* **Mitigacion:** Configurar la base de datos mediante docker y diagramar la base de datos con diagrama ER, usar librerias asincronas como asyncpg y librerias de SQLAlchemy para manejar correctamente async. Crear migraciones mediante Alembic.

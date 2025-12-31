@@ -14,7 +14,7 @@ Se utilizará el esquema de autenticación **Bearer Token** con **JWT**.
 * **Implementación:** FastAPI gestionará la seguridad de los endpoints mediante `HTTPBearer`, validando la firma del token en cada petición protegida.
 
 ### 2. Almacenamiento de Contraseñas: Hashing con Argon2
-Se utilizará el algoritmo **Argon2** (vía librería `passlib`).
+Se utilizará el algoritmo **Argon2** (vía librería `pwdlib`).
 * **Justificación:** Argon2 es el ganador de la *Password Hashing Competition*. Es resistente a ataques de fuerza bruta por GPU/ASIC, siendo superior a estándares antiguos como SHA256 o MD5.
 
 ### 3. Librería de Criptografía: PyJWT
