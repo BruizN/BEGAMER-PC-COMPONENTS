@@ -1,27 +1,25 @@
 from datetime import datetime, timedelta, timezone
 import jwt
-from passlib.context import CryptContext
+from pwdlib import PasswordHash
+from pwdlib.hashers.argon2 import Argon2Hasher
+
 from app.core.config import settings
 from fastapi.security import HTTPBearer
 
 http_bearer = HTTPBearer(auto_error=True)
 
+password_hash = PasswordHash((
+    Argon2Hasher(), 
+))
 
-pwd_context = CryptContext(
-    schemes=["argon2"],
-    deprecated="auto",
-    argon2__type="ID",
-    argon2__memory_cost=65536,
-    argon2__time_cost=3,
-    argon2__parallelism=2,
-)
 
 def hash_password(plain: str) -> str:
-    return pwd_context.hash(plain)
+    return password_hash.hash(plain)
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+    return password_hash.verify(plain, hashed)
+
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
