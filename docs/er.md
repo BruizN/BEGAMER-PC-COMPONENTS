@@ -11,3 +11,8 @@ erDiagram
         VARCHAR role "Default: 'client'"
         BOOLEAN is_active "Default: true"
     }
+
+    category {
+        UUID id PK "UUIDv7 (Time-sortable)"
+        VARCHAR name UK "Unique Not Null"
+    }
