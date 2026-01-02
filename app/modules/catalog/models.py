@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field
-from app.modules.catalog.models import CategoryBase
+from app.modules.catalog.schemas import CategoryBase
 import uuid
 import uuid6
 
