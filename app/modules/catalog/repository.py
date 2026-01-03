@@ -3,7 +3,11 @@ from sqlmodel import select
 from sqlalchemy.exc import IntegrityError
 import uuid
 from app.modules.catalog.models import Category
-from app.modules.catalog.exceptions import CategoryAlreadyExistsError, CategoryNotFoundError, CategoryNotEmptyError
+from app.modules.catalog.exceptions import (
+    CategoryAlreadyExistsError, 
+    CategoryNotFoundError, 
+    CategoryNotEmptyError
+    )
 
 async def add_category(
     session: AsyncSession,
@@ -47,21 +51,26 @@ async def update_category(
     return category
 
 async def remove_category(
+
     session: AsyncSession,
+
     category_id: uuid.UUID
+
 ) -> None:
+
     category = await session.get(Category, category_id)
 
     if not category:
         raise CategoryNotFoundError("Category not found")
 
-    session.delete(category)
-    
+    await session.delete(category)
+
     try:
         await session.flush()
+
     except IntegrityError as e:
         if "foreign key constraint" in str(e.orig):
             raise CategoryNotEmptyError("Cannot be deleted: The category contains products.")
-        raise e 
-        
+        raise e
+
     return
