@@ -1,6 +1,7 @@
 from app.modules.catalog import repository as repo
 from app.modules.catalog.models import Category
 from app.modules.catalog.schemas import CategoryCreate, CategoryUpdate
+from sqlmodel.ext.asyncio.session import AsyncSession
 import uuid
 
 async def create_category(
@@ -29,3 +30,4 @@ async def delete_category(
     category_id: uuid.UUID
 ) -> None:
     await repo.remove_category(session, category_id)
+    return
