@@ -1,5 +1,16 @@
 from fastapi import FastAPI
+from app.modules.catalog.handlers import (
+    category_exists_handler,
+    category_not_found_handler,
+    category_not_empty_handler
+)
+from app.modules.catalog.exceptions import (
+    CategoryNotFoundError, 
+    CategoryAlreadyExistsError,
+    CategoryNotEmptyError
+)
 from app.modules.auth.router import router as auth_router
+from app.modules.catalog.router import router as catalog_router
 
 app = FastAPI(
     title="BEGamer components", 
@@ -7,6 +18,9 @@ app = FastAPI(
     swagger_ui_parameters={"persistAuthorization": True}
     )
 
+app.add_exception_handler(CategoryNotFoundError, category_not_found_handler)
+app.add_exception_handler(CategoryAlreadyExistsError, category_exists_handler)
+app.add_exception_handler(CategoryNotEmptyError, category_not_empty_handler)
 
 @app.get("/health")
 async def health():
@@ -14,3 +28,4 @@ async def health():
 
 #Routers por módulo
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
+app.include_router(catalog_router, prefix="/catalog", tags=["catalog"])
