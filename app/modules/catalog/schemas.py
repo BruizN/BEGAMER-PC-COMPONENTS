@@ -1,4 +1,5 @@
 from sqlmodel import SQLModel, Field
+import uuid
 
 
 class CategoryBase(SQLModel):
