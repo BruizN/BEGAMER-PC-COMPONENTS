@@ -13,7 +13,6 @@ from app.main import app
 from app.core.db import get_db 
 from app.core.security import hash_password, create_access_token
 from app.modules.auth.models import User
-from app.modules.catalog.models import Category
 
 load_dotenv()
 
