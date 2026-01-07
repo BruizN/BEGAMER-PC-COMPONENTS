@@ -29,23 +29,29 @@ async def get_current_user(
         if user_id_str is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, 
-                detail="Token invalido"
+                detail="Invalid User Token"
                 )
 
         user_uuid = uuid6.UUID(user_id_str)
+
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Expired token"
+        )
     
-    except jwt.PyJWKError:
+    except jwt.InvalidTokenError: 
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail="Token expirado o invalido"
-            )
+            detail="Invalid token"
+        )
         
     user = await repo.get_user_by_id(session, user_uuid)
 
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail="Usuario no encontrado"
+            detail="User not found"
             ) 
     
     return user
@@ -58,7 +64,7 @@ async def get_current_admin(
     if current_user.role != "admin":
         raise HTTPException(
             status_code=403,
-            detail="Se requieren privilegios de administrador"
+            detail="Administrator privileges are required"
         )
     return current_user
 

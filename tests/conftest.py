@@ -13,6 +13,7 @@ from app.main import app
 from app.core.db import get_db 
 from app.core.security import hash_password, create_access_token
 from app.modules.auth.models import User
+from app.modules.catalog.models import Category
 
 load_dotenv()
 
@@ -150,4 +151,14 @@ async def user_client(client, client_user):
     })
     
     return client
+
+@pytest.fixture
+async def category_factory(db_session):
+    async def _create_category(name: str = "General"):
+        category = Category(name=name)
+        db_session.add(category)
+        await db_session.commit()
+        await db_session.refresh(category)
+        return category
+    return _create_category
 

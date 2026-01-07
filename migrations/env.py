@@ -13,6 +13,7 @@ from sqlmodel import SQLModel
 
 # Modelos 
 from app.modules.auth.models import User # noqa: F401
+from app.modules.catalog.models import Category # noqa: F401
 
 config = context.config
 
