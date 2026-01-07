@@ -23,7 +23,7 @@ async def test_protected_route_rejects_expired_token(client):
         "/catalog/categories",
         headers={"Authorization": f"bearer {expired_token}"}
     )
-# 4. Validar que la API lo rechace
+#   Validar que la API lo rechace
     assert response.status_code == 401
     assert "Expired token" in response.text
 
