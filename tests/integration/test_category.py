@@ -1,5 +1,4 @@
 import pytest
-from app.core.security import create_access_token
 
 async def test_create_category_ok(
     admin_client
@@ -65,7 +64,7 @@ async def test_deny_duplicated_category(
     admin_client,
     category_factory
 ):
-    category1 = await category_factory(name="Same category")
+    await category_factory(name="Same category")
     
     payload = {
         "name": "Same category"
