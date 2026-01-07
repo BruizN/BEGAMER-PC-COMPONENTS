@@ -6,7 +6,7 @@ from app.modules.catalog.schemas import (
 )
 from app.core.dependencies import SessionDep
 from app.modules.catalog import service as serv
-from app.core.dependencies import CurrentAdmin, CurrentUser
+from app.core.dependencies import CurrentAdmin
 import uuid
 
 router = APIRouter()
@@ -31,7 +31,6 @@ async def create_category(
 )
 async def list_categories(
     session: SessionDep,
-    admin: CurrentUser
 ):
     return await serv.list_categories(session)
 
