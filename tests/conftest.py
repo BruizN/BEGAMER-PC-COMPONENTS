@@ -8,10 +8,12 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 
+
 from app.main import app
 from app.core.db import get_db 
-from app.core.security import hash_password
+from app.core.security import hash_password, create_access_token
 from app.modules.auth.models import User
+from app.modules.catalog.models import Category
 
 load_dotenv()
 
@@ -66,19 +68,87 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     app.dependency_overrides.clear()
 
 @pytest.fixture
-async def test_user(db_session):
-    password_raw = "password_segura_123"
-    hashed = hash_password(password_raw)
+async def user_factory(db_session):
+    async def _create_user(
+        email: str = "default_user@test.com", 
+        password: str = "password123", 
+        role: str = "client",
+        is_active: bool = True
+    ) -> dict:
+        
+        hashed = hash_password(password)
+        new_user = User(
+            email=email,
+            hashed_password=hashed,
+            role=role,
+            is_active=is_active
+        )
+        
+        db_session.add(new_user)
+        await db_session.commit()
+        await db_session.refresh(new_user)
+        
+        return {"user": new_user, "password": password}
 
-    new_user = User(
-        email="usuario_test@ejemplo.com",
-        hashed_password=hashed,
-        role="client",
-        is_active=True
+    return _create_user
+
+
+@pytest.fixture
+async def admin_user(user_factory):
+    """
+    Creamos un unico usuario con rol admin
+    """
+    data = await user_factory(
+        email="admin_autenticado@test.com", 
+        role="admin"
     )
+    return data["user"]
 
-    db_session.add(new_user)
-    await db_session.commit()
-    await db_session.refresh(new_user)
 
-    return {"user": new_user, "password": password_raw}
+@pytest.fixture
+async def client_user(user_factory):
+    """
+    Creamos un unico usuario con rol cliente
+    """
+    data = await user_factory(
+        email="soy_cliente_reutilizable@test.com", 
+        role="client"
+        )
+    return data["user"]
+
+
+@pytest.fixture
+async def admin_client(client, admin_user):
+    """
+    1. Genera el token para el usuario admin.
+    2. Lo inyecta en el cliente.
+    3. Devuelve el cliente listo para usar.
+    """
+    access_token = create_access_token(
+        data={"sub": str(admin_user.user_id), "role": admin_user.role} 
+    )
+    
+    # Inyección
+    client.headers.update({
+        "Authorization": f"Bearer {access_token}"
+    })
+    
+    return client
+
+@pytest.fixture
+async def user_client(client, client_user):
+    """
+    1. Genera el token para el usuario client.
+    2. Lo inyecta en el cliente.
+    3. Devuelve el cliente listo para usar.
+    """
+    access_token = create_access_token(
+        data={"sub": str(client_user.user_id), "role": client_user.role}
+        )
+    # Inyección
+    client.headers.update({
+        "Authorization": f"Bearer {access_token}"
+    })
+    
+    return client
+
