@@ -2,12 +2,18 @@ from fastapi import FastAPI
 from app.modules.catalog.handlers import (
     category_exists_handler,
     category_not_found_handler,
-    category_not_empty_handler
+    category_not_empty_handler,
+    brand_exists_handler,
+    brand_not_found_handler,
+    brand_not_empty_handler
 )
 from app.modules.catalog.exceptions import (
     CategoryNotFoundError, 
     CategoryAlreadyExistsError,
-    CategoryNotEmptyError
+    CategoryNotEmptyError,
+    BrandNotFoundError,
+    BrandAlreadyExistsError,
+    BrandNotEmptyError
 )
 from app.modules.auth.router import router as auth_router
 from app.modules.catalog.router import router as catalog_router
@@ -21,6 +27,9 @@ app = FastAPI(
 app.add_exception_handler(CategoryNotFoundError, category_not_found_handler)
 app.add_exception_handler(CategoryAlreadyExistsError, category_exists_handler)
 app.add_exception_handler(CategoryNotEmptyError, category_not_empty_handler)
+app.add_exception_handler(BrandNotFoundError, brand_not_found_handler)
+app.add_exception_handler(BrandAlreadyExistsError, brand_exists_handler)
+app.add_exception_handler(BrandNotEmptyError, brand_not_empty_handler)
 
 @app.get("/health")
 async def health():
