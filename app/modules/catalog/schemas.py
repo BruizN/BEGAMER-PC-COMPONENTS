@@ -13,3 +13,15 @@ class CategoryRead(CategoryBase):
 
 class CategoryUpdate(CategoryBase):
     pass
+
+class BrandBase(SQLModel):
+    name: str = Field(unique=True, index=True)
+
+class BrandCreate(BrandBase):
+    pass
+
+class BrandRead(BrandBase):
+    brand_id: uuid.UUID
+
+class BrandUpdate(BrandBase):
+    pass
