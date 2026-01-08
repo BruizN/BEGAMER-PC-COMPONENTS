@@ -4,15 +4,20 @@
 
 ```mermaid
 erDiagram
-    users {
-        UUID id PK "UUIDv7 (Time-sortable)"
-        VARCHAR email UK "Unique, Not Null"
+    user {
+        UUID user_id PK "UUIDv7 (Time-sortable)"
+        VARCHAR email UK "Unique, "Not Null"
         VARCHAR hashed_password "Not Null"
         VARCHAR role "Default: 'client'"
         BOOLEAN is_active "Default: true"
     }
 
     category {
-        UUID id PK "UUIDv7 (Time-sortable)"
-        VARCHAR name UK "Unique Not Null"
+        UUID category_id PK "UUIDv7 (Time-sortable)"
+        VARCHAR name UK "Unique "Not Null"
+    }
+
+    brand {
+        UUID brand_id PK "UUIDv7 (Time-sortable)"
+        VARCHAR name UK "Unique "Not Null"
     }
