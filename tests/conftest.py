@@ -13,7 +13,7 @@ from app.main import app
 from app.core.db import get_db 
 from app.core.security import hash_password, create_access_token
 from app.modules.auth.models import User
-from app.modules.catalog.models import Category
+from app.modules.catalog.models import Category, Brand
 
 load_dotenv()
 
@@ -176,3 +176,12 @@ async def category_factory(db_session):
         return category
     return _create_category
 
+@pytest.fixture
+async def brand_factory(db_session):
+    async def _create_brand(name: str = "AMD"):
+        brand = Brand(name=name)
+        db_session.add(brand)
+        await db_session.commit()
+        await db_session.refresh(brand)
+        return brand
+    return _create_brand
