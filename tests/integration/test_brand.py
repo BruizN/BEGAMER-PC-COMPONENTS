@@ -51,7 +51,7 @@ async def test_delete_brand_ok(
     admin_client,
     brand_factory
 ):
-    brand = brand_factory(name="Brand")
+    brand = await brand_factory(name="Brand")
 
     response = await admin_client.delete(
         f"catalog/brand/{brand.brand_id}"
