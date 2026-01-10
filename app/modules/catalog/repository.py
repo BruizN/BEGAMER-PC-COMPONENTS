@@ -2,11 +2,14 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel import select
 from sqlalchemy.exc import IntegrityError
 import uuid
-from app.modules.catalog.models import Category
+from app.modules.catalog.models import Category, Brand
 from app.modules.catalog.exceptions import (
     CategoryAlreadyExistsError, 
     CategoryNotFoundError, 
-    CategoryNotEmptyError
+    CategoryNotEmptyError,
+    BrandAlreadyExistsError,
+    BrandNotFoundError,
+    BrandNotEmptyError
     )
 
 async def add_category(
@@ -74,3 +77,67 @@ async def remove_category(
         raise e
 
     return
+
+async def add_brand(
+    session: AsyncSession,
+    new_brand: Brand
+) -> Brand:
+    session.add(new_brand)
+    try:
+        await session.flush()
+    except IntegrityError as e:
+        if "unique constraint" in str(e.orig):
+            raise BrandAlreadyExistsError("Brand already exists")
+        raise e
+    return new_brand
+
+async def get_all_brands(
+    session: AsyncSession,
+) -> list[Brand]:
+    result = await session.exec(select(Brand))
+    return list(result.all())
+
+async def update_brand(
+    session: AsyncSession,
+    brand_id: uuid.UUID,
+    update_data: dict
+) -> Brand:
+    brand = await session.get(Brand, brand_id)
+
+    if not brand:
+        raise BrandNotFoundError("Brand not found")
+
+    brand.sqlmodel_update(update_data)
+
+    session.add(brand)
+    try:
+        await session.flush()
+    except IntegrityError as e:
+        if "unique constraint" in str(e.orig):
+            raise BrandAlreadyExistsError("Brand already exists")
+        raise e
+    
+    return brand
+
+async def remove_brand(
+    session: AsyncSession,
+    brand_id: uuid.UUID
+) -> None:
+    brand = await session.get(Brand, brand_id)
+
+    if not brand:
+        raise BrandNotFoundError("Brand not found")
+    
+    await session.delete(brand)
+
+    try:
+        await session.flush()
+
+    except IntegrityError as e:
+        if "foreign key constraint" in str(e.orig):
+            raise BrandNotEmptyError(
+                "Cannot be deleted: The brand contains products."
+                )
+        raise e
+
+    return  

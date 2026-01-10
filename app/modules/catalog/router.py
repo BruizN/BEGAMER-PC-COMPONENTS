@@ -2,7 +2,10 @@ from fastapi import APIRouter, status
 from app.modules.catalog.schemas import (
     CategoryCreate, 
     CategoryRead, 
-    CategoryUpdate
+    CategoryUpdate,
+    BrandCreate,
+    BrandRead,
+    BrandUpdate
 )
 from app.core.dependencies import SessionDep
 from app.modules.catalog import service as serv
@@ -58,4 +61,53 @@ async def delete_category(
     category_id: uuid.UUID
 ) -> None:
     await serv.delete_category(session, category_id)
+    return
+
+@router.post(
+    "/brand",
+    response_model=BrandRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a new brand for your products"
+)
+async def create_brand(
+    session: SessionDep,
+    admin: CurrentAdmin,
+    body: BrandCreate
+):
+    return await serv.create_brand(session, body)
+
+@router.get(
+    "/brands",
+    response_model=list[BrandRead],
+    summary="List all registered brands"
+)
+async def list_brands(
+    session: SessionDep
+):
+    return await serv.list_brands(session)
+
+@router.put(
+    "/brand/{brand_id}",
+    response_model=BrandRead,
+    summary="Update an existing brand by its id"
+)
+async def edit_brand(
+    session: SessionDep,
+    admin: CurrentAdmin,
+    brand_id: uuid.UUID,
+    body: BrandUpdate
+):
+    return await serv.edit_brand(session, brand_id, body)
+
+@router.delete(
+    "/brand/{brand_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete an existing brand by its id"
+)
+async def delete_brand(
+    session: SessionDep,
+    admin: CurrentAdmin,
+    brand_id: uuid.UUID
+):
+    await serv.delete_brand(session, brand_id)
     return
