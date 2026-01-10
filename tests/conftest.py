@@ -27,15 +27,6 @@ if not TEST_DATABASE_URL:
 def engine():
     return create_async_engine(TEST_DATABASE_URL, echo=False, future=True)
 
-@pytest.fixture(scope="session")
-def async_session_factory(engine):
-    return async_sessionmaker(
-        bind=engine,
-        class_=AsyncSession,
-        expire_on_commit=False,
-        autoflush=False
-    )
-
 @pytest.fixture(scope="session", autouse=True)
 async def setup_test_db(engine):
     async with engine.begin() as conn:
@@ -46,10 +37,31 @@ async def setup_test_db(engine):
         await conn.run_sync(SQLModel.metadata.drop_all)
     await engine.dispose()
 
+
 @pytest.fixture(scope="function")
-async def db_session(async_session_factory) -> AsyncGenerator[AsyncSession, None]:
-    async with async_session_factory() as session:
-        yield session
+async def db_session(engine) -> AsyncGenerator[AsyncSession, None]:
+    # Abrir una conexión a la BD
+    async with engine.connect() as connection:
+        
+        # Inicia una Transacción
+        transaction = await connection.begin()
+        
+        # Crea la sesión atada a esa conexión y transacción
+        # NO cierra la transacción.
+        session_factory = async_sessionmaker(
+            bind=connection,
+            class_=AsyncSession,
+            expire_on_commit=False,
+            autoflush=False,
+            join_transaction_mode="create_savepoint" # <--- crea un Savepoint
+        )
+        
+        async with session_factory() as session:
+            yield session # Aquí corren los tests
+
+        # Al terminar el test, hacemos Rollback de la transacción Madre
+        # Esto deshace TODO lo que pasó, incluidos los commits
+        await transaction.rollback()
 
 # Fixture del Cliente
 @pytest.fixture(scope="function")
@@ -66,6 +78,8 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
         yield c
 
     app.dependency_overrides.clear()
+
+
 
 @pytest.fixture
 async def user_factory(db_session):
