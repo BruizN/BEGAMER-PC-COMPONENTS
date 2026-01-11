@@ -15,9 +15,11 @@ erDiagram
     category {
         UUID category_id PK "UUIDv7 (Time-sortable)"
         VARCHAR name UK "Unique "Not Null"
+        VARCHAR code UK "Unique "Not Null"
     }
 
     brand {
         UUID brand_id PK "UUIDv7 (Time-sortable)"
         VARCHAR name UK "Unique "Not Null"
+        VARCHAR code UK "Unique "Not Null"
     }
