@@ -27,7 +27,7 @@ async def edit_category(
     category_id: uuid.UUID,
     edit_category_data: CategoryUpdate 
 ) -> Category:
-    update_data = edit_category_data.model_dump()
+    update_data = edit_category_data.model_dump(exclude_unset=True)
     return await repo.update_category(session, category_id, update_data)
 
 async def delete_category(
@@ -55,7 +55,7 @@ async def edit_brand(
     brand_id: uuid.UUID,
     edit_brand_data: BrandUpdate
 ) -> Brand:
-    update_data = edit_brand_data.model_dump()
+    update_data = edit_brand_data.model_dump(exclude_unset=True)
     return await repo.update_brand(session, brand_id, update_data)
 
 async def delete_brand(

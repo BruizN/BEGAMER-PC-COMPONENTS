@@ -37,7 +37,7 @@ async def list_categories(
 ):
     return await serv.list_categories(session)
 
-@router.put(
+@router.patch(
     "/categories/{category_id}",
     response_model=CategoryRead,
     summary="Update an existing category by its id"
@@ -86,7 +86,7 @@ async def list_brands(
 ):
     return await serv.list_brands(session)
 
-@router.put(
+@router.patch(
     "/brand/{brand_id}",
     response_model=BrandRead,
     summary="Update an existing brand by its id"
