@@ -63,7 +63,7 @@
  <li><strong>Implementación:</strong> FastAPI gestionará la seguridad de los endpoints mediante <code>HTTPBearer</code>, validando la firma del token en cada petición protegida.</li>
 </ul>
 <h3>2. Almacenamiento de Contraseñas: Hashing con Argon2</h3>
-<p>Se utilizará el algoritmo <strong>Argon2</strong> (vía librería <code>passlib</code>).</p>
+<p>Se utilizará el algoritmo <strong>Argon2</strong> (vía librería <code>pwdlib</code>).</p>
 <ul>
  <li><strong>Justificación:</strong> Argon2 es el ganador de la <em>Password Hashing Competition</em>. Es resistente a ataques de fuerza bruta por GPU/ASIC, siendo superior a estándares antiguos como SHA256 o MD5.</li>
 </ul>

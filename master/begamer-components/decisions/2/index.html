@@ -51,7 +51,7 @@
           </ul>
         </div>
         <div class="content p-3">
-          <div><h1>Selección de Motor de Base de Datos Principal y ORM</h1>
+          <div><h1>Selección de Motor de Base de Datos Principal, ORM y gestor de migraciones</h1>
 <ul>
  <li><strong>Estado:</strong> Aceptado</li>
  <li><strong>Fecha:</strong> 2025-12-09</li>
@@ -68,14 +68,14 @@
  <li>SQLModel</li>
 </ul>
 <h2>Decisión</h2>
-<p>Se seleccionará <strong>PostgreSQL</strong> junto a <strong>SQLModel</strong>.</p>
+<p>Se seleccionará <strong>PostgreSQL</strong> junto a <strong>SQLModel</strong> y <strong>Alembic</strong>.</p>
 <h2>Justificación</h2>
-<p>Al ser un e-commerce, la relación entre tablas (Usuario -&gt; Orden -&gt; Detalle -&gt; Producto) es fuerte. Se necesitan transacciones ACID para asegurar que al comprar, se descuente el stock inmediatamente. PostgreSQL ofrece esto y además tiene buen soporte para JSON si se necesita guardar especificaciones técnicas flexibles de los PC. Para el ORM SQLModel es excelente considerando que se trabaja con FastAPI, ya que ofrece la validación de datos de Pydantic y la definición de tablas como modelos entre otras cosas, usando SQLAlchemy por debajo.</p>
+<p>Al ser un e-commerce, la relación entre tablas (Usuario -&gt; Orden -&gt; Detalle -&gt; Producto) es fuerte. Se necesitan transacciones ACID para asegurar que al comprar, se descuente el stock inmediatamente. PostgreSQL ofrece esto y además tiene buen soporte para JSON si se necesita guardar especificaciones técnicas flexibles de los PC. Para el ORM SQLModel es excelente considerando que se trabaja con FastAPI, ya que ofrece la validación de datos de Pydantic y la definición de tablas como modelos entre otras cosas, usando SQLAlchemy por debajo. Se usará Alembic para la gestión de migraciones de la base de datos ya que es el éstandar junto a SQLModel/SQLAlchemy</p>
 <h3>Consecuencias</h3>
 <ul>
  <li><strong>Positivas:</strong> Integridad referencial fuerte. Stack tecnológico alineado con el mercado laboral enterprise, desarrollador con experiencia en PostgreSQL. SQLModel creado por el mismo creador de FastAPI otorgando amplia compatibilidad y funcionamiento.</li>
  <li><strong>Negativas:</strong> Requiere definir esquemas (migrations) antes de programar, y una configuracion adicional para la base de datos PostgreSQL. Ademas de que se necesitaran usar librerias asincronas para compatibilidad con la app FastAPI asincrona.</li>
- <li><strong>Mitigacion:</strong> Configurar la base de datos mediante docker y diagramar la base de datos con diagrama ER, usar librerias asincronas como asyncpg y librerias de SQLAlchemy para manejar correctamente async.</li>
+ <li><strong>Mitigacion:</strong> Configurar la base de datos mediante docker y diagramar la base de datos con diagrama ER, usar librerias asincronas como asyncpg y librerias de SQLAlchemy para manejar correctamente async. Crear migraciones mediante Alembic.</li>
 </ul></div>
         </div>
       </div>
