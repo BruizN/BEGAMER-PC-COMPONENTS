@@ -5,7 +5,7 @@ import re
 
 
 class HasCodeMixin(SQLModel):
-    code: str = Field(unique=True, index=True)
+    code: str = Field(unique=True, index=True, min_length=2, max_length=4)
 
     @field_validator("code")
     @classmethod
@@ -30,8 +30,11 @@ class HasNameMixin(SQLModel):
         if v is None:
             return v
             
-        v = v.strip()
-        return v.title()
+        v = v.title().strip()
+        if not (3 <= len(v) <= 30):
+            raise ValueError("The name must be between 3 and 30 characters long.")
+
+        return v
 
 
 class CategoryBase(HasNameMixin, HasCodeMixin, SQLModel):
