@@ -7,50 +7,74 @@ assignees: ''
 
 ---
 
-## 📖 Historia de Usuario (API): [Título Corto]
+## 📖 Historia de Usuario (API): [Nombre de la Funcionalidad]
 
-> **Como** [Cliente de la API / Frontend / Sistema externo]
-> **Quiero** [Operación sobre la API: crear, listar, actualizar, etc.]
-> **Para** [Objetivo o valor que se logra con esta operación]
+> **Como** [Rol del Usuario (ej: Administrador, Cliente)]
+> **Quiero** [Acción a realizar (ej: crear, listar, borrar)]
+> **Para** [Beneficio o valor de negocio]
 
 ---
 
 ## ✅ Criterios de Aceptación (API)
 
 ### 🟢 Escenarios de Éxito (Happy Path)
-- [ ] **Escenario 1: [Nombre del flujo principal]**
-  * **Dado** que envío una petición HTTP **[método]** a `[/ruta/del/endpoint]`
-  * **Y** el cuerpo de la petición contiene:
-    * `[campo1]` = [tipo / condición]
-    * `[campo2]` = [tipo / condición]
-  * **Cuando** el backend procesa la petición
-  * **Entonces** debe responder con código **[200 / 201 / 204...]**
-  * **Y** el cuerpo de la respuesta debe incluir:
-    * `[campo_respuesta1]`
-    * `[campo_respuesta2]`
-  * **Y** el cambio debe reflejarse en la base de datos (registros creados/actualizados/eliminados).
+1. [Nombre del Escenario 1]
+   * **Dado** que [Precondición (ej: tengo token válido)]
+   * **Y** envío un [METODO] a `[endpoint]` con JSON `{ "campo": "valor" }`
+   * **Entonces** recibo un [Status Code (ej: 201 Created)]
+   * **Y** la respuesta incluye [Datos esperados en el body]
+
+2. [Nombre del Escenario 2]
+   * **Dado** que [Precondición]
+   * **Y** envío un [METODO] a `[endpoint]`
+   * **Entonces** recibo un [Status Code]
+   * **Y** [Resultado esperado]
+
+3. [Nombre del Escenario 3]
+   * **Dado** que [Precondición]
+   * **Y** envío un [METODO] a `[endpoint]`
+   * **Entonces** recibo un [Status Code]
 
 ### 🟠 Escenarios Alternativos y Errores (Edge Cases)
-- [ ] **Escenario 2: Datos inválidos**
-  * **Dado** que envío una petición HTTP con datos incompletos o inválidos
-  * **Cuando** el backend valida la petición
-  * **Entonces** debe responder con código **4xx (por ejemplo 400 o 422)**
-  * **Y** el cuerpo de la respuesta debe incluir un mensaje de error descriptivo.
+- [ ] [Nombre del Error/Caso Borde]:
+   * Si intento [Acción que provoca el error].
+   * Entonces recibo un [Status Code (ej: 409 Conflict)] ("[Mensaje de error]").
 
-- [ ] **Escenario 3: Restricciones de negocio / base de datos**
-  * **Dado** que intento realizar una operación que viola una regla (por ejemplo, SKU duplicado)
-  * **Cuando** el backend intenta guardar los datos
-  * **Entonces** debe responder con código **409 (Conflict)** u otro código definido
-  * **Y** no debe modificar los datos existentes.
+- [ ] [Restricción de Integridad/Lógica]:
+   * Si intento [Acción prohibida por lógica de negocio].
+   * Entonces recibo un [Status Code] ("[Mensaje de error]").
 
----
-
-## 🔍 Notas de Pruebas (Opcional)
-* Casos de prueba unitarios / de integración que validen:
-  * Respuesta correcta del endpoint (status + body).
-  * Escritura correcta en la base de datos (inserción / actualización / borrado).
-  * Manejo de errores (validación, restricciones de unicidad, etc.).
+- [ ] [Permisos Insuficientes]:
+   * Si un usuario '[Rol no autorizado]' intenta hacer [Acción].
+   * Entonces recibo un 403 Forbidden.
 
 ---
 
-> 🔧 Detalles más técnicos (modelo SQL, migraciones, estructura de tablas, ORMs, etc.) se documentan en el **SDD** o en la documentación técnica de la API.
+## 🛠️ Tareas Técnicas
+1. **Capa de Modelos ([Tecnología/ORM]):**
+   * Definir tabla/entidad `[NombreEntidad]` y sus esquemas (DTOs/Pydantic).
+   * Campos clave: `[campo1]`, `[campo2]`.
+
+2. **Migraciones y Base de Datos:**
+   * Generar revisión (ej: Alembic) y aplicar cambios.
+   * [Opcional] Crear seed data.
+
+3. **Lógica de Negocio / Controladores:**
+   * Implementar endpoints: `[GET/POST/PUT/DELETE]`.
+   * Validar permisos y roles.
+
+4. **Documentación:**
+   * Actualizar OpenAPI/Swagger, README o Diagramas si aplica.
+
+---
+
+## 🔍 Notas de Pruebas
+* **Casos de prueba unitarios / de integración que validen:**
+   * Respuesta correcta del endpoint (status + body).
+   * Persistencia correcta en la base de datos (Create/Update/Delete).
+   * Manejo de errores (validaciones de input, unicidad, FKs).
+   * Validación de seguridad (Tokens/Roles).
+
+---
+
+> 🔧 Detalles más técnicos en [Enlace a Documentación/Wiki]
