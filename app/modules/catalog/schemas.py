@@ -57,7 +57,7 @@ class BrandCreate(BrandBase):
 class BrandRead(BrandBase):
     brand_id: uuid.UUID
 
-class BrandUpdate(SQLModel):
+class BrandUpdate(HasNameMixin, HasCodeMixin, SQLModel):
     name: str | None = Field(default=None, min_length=3, max_length=30)
     code: str | None = Field(default=None)
 
