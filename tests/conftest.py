@@ -168,8 +168,8 @@ async def user_client(client, client_user):
 
 @pytest.fixture
 async def category_factory(db_session):
-    async def _create_category(name: str = "General"):
-        category = Category(name=name)
+    async def _create_category(name: str, code: str):
+        category = Category(name=name.title(), code=code.upper()) #Reglas de negocio
         db_session.add(category)
         await db_session.commit()
         await db_session.refresh(category)
@@ -178,8 +178,8 @@ async def category_factory(db_session):
 
 @pytest.fixture
 async def brand_factory(db_session):
-    async def _create_brand(name: str = "AMD"):
-        brand = Brand(name=name)
+    async def _create_brand(name: str, code: str):
+        brand = Brand(name=name.title(), code=code.upper()) 
         db_session.add(brand)
         await db_session.commit()
         await db_session.refresh(brand)
