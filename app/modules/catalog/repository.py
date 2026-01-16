@@ -20,9 +20,20 @@ async def add_category(
     try:
         await session.flush()
     except IntegrityError as e:
-        if "unique constraint" in str(e.orig): 
-             raise CategoryAlreadyExistsError("Category already exists")
+        error_msg = str(e.orig) 
+        # Duplicado por CODIGO
+        if "code" in error_msg: 
+             raise CategoryAlreadyExistsError(
+                f"The category with the code '{new_category.code}' already exists."
+             )
+        # Duplicado por NOMBRE
+        elif "name" in error_msg:
+             raise CategoryAlreadyExistsError(
+                f"The category with the name '{new_category.name}' already exists."
+             )           
+             
         raise e 
+        
     return new_category
 
 async def get_all_categories(
@@ -47,8 +58,17 @@ async def update_category(
     try:
         await session.flush()
     except IntegrityError as e:
-        if "unique constraint" in str(e.orig): 
-             raise CategoryAlreadyExistsError("Category already exists")
+        error_msg = str(e.orig) 
+
+        if "code" in error_msg: 
+             raise CategoryAlreadyExistsError(
+                f"The category with the code '{update_data["code"]}' already exists."
+             )
+
+        elif "name" in error_msg:
+             raise CategoryAlreadyExistsError(
+                f"The category with the name '{update_data["name"]}' already exists."
+             )           
         raise e 
         
     return category
@@ -86,9 +106,19 @@ async def add_brand(
     try:
         await session.flush()
     except IntegrityError as e:
-        if "unique constraint" in str(e.orig):
-            raise BrandAlreadyExistsError("Brand already exists")
-        raise e
+        error_msg = str(e.orig) 
+
+        if "code" in error_msg: 
+             raise BrandAlreadyExistsError(
+                f"The brand with the code '{new_brand.code}' already exists."
+             )
+
+        elif "name" in error_msg:
+             raise BrandAlreadyExistsError(
+                f"The brand with the name '{new_brand.name}' already exists."
+             )           
+             
+        raise e 
     return new_brand
 
 async def get_all_brands(
@@ -113,9 +143,19 @@ async def update_brand(
     try:
         await session.flush()
     except IntegrityError as e:
-        if "unique constraint" in str(e.orig):
-            raise BrandAlreadyExistsError("Brand already exists")
-        raise e
+        error_msg = str(e.orig) 
+
+        if "code" in error_msg: 
+             raise BrandAlreadyExistsError(
+                f"The brand with the code '{update_data["code"]}' already exists."
+             )
+
+        elif "name" in error_msg:
+             raise BrandAlreadyExistsError(
+                f"The brand with the name '{update_data["name"]}' already exists."
+             )           
+        raise e 
+        
     
     return brand
 
