@@ -88,7 +88,7 @@ async def test_deny_duplicated_brand_mofication(
     brand = await brand_factory(name="asus", code="asu")
     
     # Crea la categoría "rival" (la que ya tiene el código ocupado)
-    brand2 = await brand_factory(name="corsair", code="cor")
+    await brand_factory(name="corsair", code="cor")
     
     payload = {
         "name": "corsair",

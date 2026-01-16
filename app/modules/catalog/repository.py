@@ -109,12 +109,12 @@ async def add_brand(
         error_msg = str(e.orig) 
 
         if "code" in error_msg: 
-             raise CategoryAlreadyExistsError(
+             raise BrandAlreadyExistsError(
                 f"The brand with the code '{new_brand.code}' already exists."
              )
 
         elif "name" in error_msg:
-             raise CategoryAlreadyExistsError(
+             raise BrandAlreadyExistsError(
                 f"The brand with the name '{new_brand.name}' already exists."
              )           
              
@@ -146,12 +146,12 @@ async def update_brand(
         error_msg = str(e.orig) 
 
         if "code" in error_msg: 
-             raise CategoryAlreadyExistsError(
+             raise BrandAlreadyExistsError(
                 f"The brand with the code '{update_data["code"]}' already exists."
              )
 
         elif "name" in error_msg:
-             raise CategoryAlreadyExistsError(
+             raise BrandAlreadyExistsError(
                 f"The brand with the name '{update_data["name"]}' already exists."
              )           
         raise e 

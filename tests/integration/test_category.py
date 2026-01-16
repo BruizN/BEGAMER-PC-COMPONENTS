@@ -88,7 +88,7 @@ async def test_deny_duplicated_category_mofication(
     category = await category_factory(name="Procesador", code="CPU")
     
     # Crea la categoría "rival" (la que ya tiene el código ocupado)
-    category2 = await category_factory(name="Tarjeta de video", code="GPU")
+    await category_factory(name="Tarjeta de video", code="GPU")
     
     payload = {
         "name": "proceSADOR",
