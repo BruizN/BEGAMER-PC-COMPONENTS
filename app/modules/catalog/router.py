@@ -64,7 +64,7 @@ async def delete_category(
     return
 
 @router.post(
-    "/brand",
+    "/brands",
     response_model=BrandRead,
     status_code=status.HTTP_201_CREATED,
     summary="Create a new brand for your products"
@@ -87,7 +87,7 @@ async def list_brands(
     return await serv.list_brands(session)
 
 @router.patch(
-    "/brand/{brand_id}",
+    "/brands/{brand_id}",
     response_model=BrandRead,
     summary="Update an existing brand by its id"
 )
@@ -100,7 +100,7 @@ async def edit_brand(
     return await serv.edit_brand(session, brand_id, body)
 
 @router.delete(
-    "/brand/{brand_id}",
+    "/brands/{brand_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete an existing brand by its id"
 )

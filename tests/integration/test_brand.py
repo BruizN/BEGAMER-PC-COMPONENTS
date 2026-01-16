@@ -8,7 +8,7 @@ async def test_create_brand_ok(
         "code": "cors"
     }
 
-    response = await admin_client.post("/catalog/brand", json=payload)
+    response = await admin_client.post("/catalog/brands", json=payload)
 
     assert response.status_code == 201
     data = response.json()
@@ -40,7 +40,7 @@ async def test_update_brand_ok(
     payload = {"name": "asus"}
 
     response = await admin_client.patch(
-        f"/catalog/brand/{old_brand.brand_id}", 
+        f"/catalog/brands/{old_brand.brand_id}", 
         json=payload
         )
 
@@ -58,7 +58,7 @@ async def test_delete_brand_ok(
     brand = await brand_factory(name="asus", code="asu")
 
     response = await admin_client.delete(
-        f"/catalog/brand/{brand.brand_id}"
+        f"/catalog/brands/{brand.brand_id}"
         )
     
     assert response.status_code == 204
@@ -76,7 +76,7 @@ async def test_deny_duplicated_brand_creation(
         "code": "asu"
     }
 
-    response = await admin_client.post("/catalog/brand", json=payload)
+    response = await admin_client.post("/catalog/brands", json=payload)
     #Comprobar duplicados independientemente de si los nombres esten capitalizados o no
     assert response.status_code == 409
 
@@ -96,7 +96,7 @@ async def test_deny_duplicated_brand_mofication(
     }
 
     response = await admin_client.patch(
-        f"/catalog/brand/{brand.brand_id}", 
+        f"/catalog/brands/{brand.brand_id}", 
         json=payload
     )
     
@@ -105,10 +105,10 @@ async def test_deny_duplicated_brand_mofication(
 
 #Comprobar denegación inmediata a usuarios clientes
 @pytest.mark.parametrize("endpoint, method, status", [
-    ("/catalog/brand", "post", 403),
+    ("/catalog/brands", "post", 403),
     ("/catalog/brands", "get", 200),
-    ("/catalog/brand/999", "patch", 403),
-    ("/catalog/brand/999", "delete", 403),
+    ("/catalog/brands/999", "patch", 403),
+    ("/catalog/brands/999", "delete", 403),
 ])
 async def test_brand_permissions_for_client(
     user_client,
