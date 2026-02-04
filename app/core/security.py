@@ -7,6 +7,7 @@ from app.core.config import settings
 from fastapi.security import HTTPBearer
 
 http_bearer = HTTPBearer(auto_error=True)
+http_bearer_optional = HTTPBearer(auto_error=False)
 
 password_hash = PasswordHash((
     Argon2Hasher(), 
