@@ -19,8 +19,11 @@ async def create_category(
     
 async def list_categories(
     session: AsyncSession,
+    offset: int,
+    limit: int,
+    only_active: bool
 ) -> list[Category]:
-    return await repo.get_all_categories(session)
+    return await repo.get_all_categories(session, offset, limit, only_active)
 
 async def edit_category(
     session: AsyncSession,
@@ -47,8 +50,11 @@ async def create_brand(
 
 async def list_brands(
     session: AsyncSession,
+    offset: int,
+    limit: int,
+    only_active: bool
 ) -> list[Brand]:
-    return await repo.get_all_brands(session)
+    return await repo.get_all_brands(session, offset, limit, only_active)
 
 async def edit_brand(
     session: AsyncSession,
