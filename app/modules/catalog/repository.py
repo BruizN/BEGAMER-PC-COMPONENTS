@@ -41,12 +41,15 @@ async def get_category(
     category_id: uuid.UUID,
     only_active: bool
 ) -> Category:
-    query = select(Category)
+    query = select(Category).where(Category.category_id == category_id)
     if only_active:
         query = query.where(Category.is_active == True)
     
     result = await session.exec(query)
-    return result.first()
+    category = result.first()
+    if not category:
+        raise CategoryNotFoundError("Category not found")
+    return category
 
 async def get_all_categories(
     session: AsyncSession,
@@ -147,12 +150,15 @@ async def get_brand(
     brand_id: uuid.UUID,
     only_active: bool
 ) -> Brand:
-    query = select(Brand)
+    query = select(Brand).where(Brand.brand_id == brand_id)
     if only_active:
         query = query.where(Brand.is_active == True)
     
     result = await session.exec(query)
-    return result.first()
+    brand = result.first()
+    if not brand:
+        raise BrandNotFoundError("Brand not found")
+    return brand
 
 async def get_all_brands(
     session: AsyncSession,
