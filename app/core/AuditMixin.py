@@ -19,3 +19,4 @@ class AuditMixin(SQLModel):
             "onupdate": func.now()
         }
     )
+    is_active: bool = True
