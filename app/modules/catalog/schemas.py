@@ -50,6 +50,7 @@ class CategoryUpdate(HasNameMixin, HasCodeMixin, SQLModel):
     # Sobrescribe los campos para hacerlos opcionales.
     name: str | None = Field(default=None, min_length=3, max_length=30)
     code: str | None = Field(default=None, min_length=2, max_length=4)
+    is_active: bool | None = None
 
 class BrandBase(HasNameMixin, HasCodeMixin, SQLModel):
     pass
@@ -63,3 +64,4 @@ class BrandRead(BrandBase):
 class BrandUpdate(HasNameMixin, HasCodeMixin, SQLModel):
     name: str | None = Field(default=None, min_length=3, max_length=30)
     code: str | None = Field(default=None, min_length=2, max_length=4)
+    is_active: bool | None = None
