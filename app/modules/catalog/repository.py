@@ -36,6 +36,18 @@ async def add_category(
         
     return new_category
 
+async def get_category(
+    session: AsyncSession,
+    category_id: uuid.UUID,
+    only_active: bool
+) -> Category:
+    query = select(Category)
+    if only_active:
+        query = query.where(Category.is_active == True)
+    
+    result = await session.exec(query)
+    return result.first()
+
 async def get_all_categories(
     session: AsyncSession,
     offset: int,
@@ -129,6 +141,18 @@ async def add_brand(
              
         raise e 
     return new_brand
+
+async def get_brand(
+    session: AsyncSession,
+    brand_id: uuid.UUID,
+    only_active: bool
+) -> Brand:
+    query = select(Brand)
+    if only_active:
+        query = query.where(Brand.is_active == True)
+    
+    result = await session.exec(query)
+    return result.first()
 
 async def get_all_brands(
     session: AsyncSession,

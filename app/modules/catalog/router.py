@@ -27,6 +27,29 @@ async def create_category(
 ):
     return await serv.create_category(session, body)
 
+
+@router.get(
+    "/categories/{category_id}",
+    response_model=CategoryRead,
+    summary="Get a category by its id (Admins see all, Guests see active only)"
+)
+async def get_category(
+    session: SessionDep,
+    category_id: uuid.UUID,
+    user: CurrentUserOptional
+):
+    is_admin = False
+    
+    if user is not None and user.role == "admin":
+        is_admin = True
+    
+    should_filter_active = not is_admin 
+    return await serv.get_category(
+        session, 
+        category_id, 
+        only_active=should_filter_active
+    )
+
 @router.get(
     "/categories",
     response_model=list[CategoryRead],
@@ -89,6 +112,29 @@ async def create_brand(
     body: BrandCreate
 ):
     return await serv.create_brand(session, body)
+
+
+@router.get(
+    "/brands/{brand_id}",
+    response_model=BrandRead,
+    summary="Get a brand by its id (Admins see all, Guests see active only)"
+)
+async def get_brand(
+    session: SessionDep,
+    brand_id: uuid.UUID,
+    user: CurrentUserOptional
+):
+    is_admin = False
+    
+    if user is not None and user.role == "admin":
+        is_admin = True
+    
+    should_filter_active = not is_admin 
+    return await serv.get_brand(
+        session, 
+        brand_id, 
+        only_active=should_filter_active
+    )
 
 @router.get(
     "/brands",
