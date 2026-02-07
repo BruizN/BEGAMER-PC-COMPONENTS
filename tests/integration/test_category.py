@@ -1,4 +1,5 @@
 import pytest
+from datetime import datetime, timezone, timedelta
 
 async def test_create_category_ok(
     admin_client
@@ -15,41 +16,110 @@ async def test_create_category_ok(
     #Comprobar .title() y upper()
     assert data["name"] == payload["name"].title()
     assert data["code"] == payload["code"].upper()
+    assert data["is_active"]
+    assert "created_at" in data
+    assert "updated_at" in data
     assert "category_id" in data
 
 
-async def test_list_categories_ok(
+#Comprobar paginación y que siendo admin se vean todas las categorías incluso las inactivas
+async def test_list_categories_admin_ok(
     admin_client,
     category_factory
 ):
-    await category_factory(name="Tarjeta de video", code="gpu")
-    await category_factory(name="Fuente de alimentación", code="psu")
+    await category_factory(name="Tarjeta de video", code="gpu", is_active=True)
+    await category_factory(name="Fuente de alimentación", code="psu", is_active=True)
+    await category_factory(name="Procesador", code="cpu", is_active=False)
+    await category_factory(name="Memoria RAM", code="ram", is_active=True)
+    await category_factory(name="Almacenamiento", code="sto", is_active=False)
 
-    response = await admin_client.get("/catalog/categories")
+    response = await admin_client.get("/catalog/categories?offset=2&limit=4")
 
     assert response.status_code == 200
     data = response.json()
-    assert len(data) == 2
+    assert len(data) == 3
 
-async def test_update_categories_ok(
+
+#Comprobar paginación y que siendo usuario solo se vean las categorías activas
+async def test_list_categories_user_ok(
+    user_client,
+    category_factory
+    ):
+    await category_factory(name="Tarjeta de video", code="gpu", is_active=True)
+    await category_factory(name="Fuente de alimentación", code="psu", is_active=True)
+    await category_factory(name="Procesador", code="cpu", is_active=False)
+    await category_factory(name="Memoria RAM", code="ram", is_active=True)
+    await category_factory(name="Almacenamiento", code="sto", is_active=False)
+
+    response = await user_client.get("/catalog/categories?offset=2&limit=4")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 1
+
+#Comprobar denegación de acceso a categoría inactiva para usuarios sin rol de admin
+async def test_deny_get_category_user_by_id(
+    user_client,
+    category_factory
+):
+    category = await category_factory(name="tarjeta devideo", code="gpu", is_active=False)
+    response = await user_client.get(f"/catalog/categories/{category.category_id}")
+    assert response.status_code == 404
+
+#Comprobar acceso a categoría tanto activa como inactiva para usuarios con rol de admin
+async def test_get_category_by_id_ok(
     admin_client,
     category_factory
 ):
-    old_category = await category_factory(name="tarjeta devideo", code="gpu")
+    category = await category_factory(name="tarjeta devideo", code="gpu")
+    response = await admin_client.get(f"/catalog/categories/{category.category_id}")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["category_id"] == str(category.category_id)
+    assert data["name"] == category.name.title()
+    assert data["code"] == category.code.upper()
+    assert data["is_active"] == category.is_active
     
-    payload = {"name": "tarjeta de video"}
+    category2 = await category_factory(name="procesador", code="cpu", is_active=False)
+    response = await admin_client.get(f"/catalog/categories/{category2.category_id}")
+    assert response.status_code == 200
+
+
+#Comprobar actualización parcial de una categoría y "soft delete"
+async def test_update_categories_ok(
+    admin_client,
+    category_factory,
+):
+    past_date = datetime.now(timezone.utc) - timedelta(days=1)
+    
+    category = await category_factory(
+        name="tarjeta devideo", 
+        code="gpu", 
+        created_at=past_date,
+        updated_at=past_date
+    )
+    
+    #Debido a como sqlalchemy actualiza los campos, guardamos el valor original en una variable aparte
+    original_updated_at = category.updated_at
+    original_id = str(category.category_id)
+
+    payload = {"name": "Tarjeta De Video", "is_active": False}
 
     response = await admin_client.patch(
-        f"/catalog/categories/{old_category.category_id}", 
+        f"/catalog/categories/{original_id}", 
         json=payload
         )
 
     assert response.status_code == 200
     data = response.json()
-    assert data["name"] == payload["name"].title()
-    #Comprobar actualización parcial
-    assert data["code"] == old_category.code.upper()
-    assert data["category_id"] == str(old_category.category_id)
+    
+    response_updated_at = datetime.fromisoformat(data["updated_at"])
+
+    assert response_updated_at != original_updated_at
+    assert response_updated_at > original_updated_at
+    
+    assert data["name"] == "Tarjeta De Video"
+    assert not data["is_active"]
 
 async def test_delete_categories_ok(
     admin_client,
