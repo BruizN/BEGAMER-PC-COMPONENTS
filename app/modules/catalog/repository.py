@@ -36,10 +36,34 @@ async def add_category(
         
     return new_category
 
+async def get_category(
+    session: AsyncSession,
+    category_id: uuid.UUID,
+    only_active: bool
+) -> Category:
+    query = select(Category).where(Category.category_id == category_id)
+    if only_active:
+        query = query.where(Category.is_active)
+    
+    result = await session.exec(query)
+    category = result.first()
+    if not category:
+        raise CategoryNotFoundError("Category not found")
+    return category
+
 async def get_all_categories(
     session: AsyncSession,
+    offset: int,
+    limit: int,
+    only_active: bool = True
 ) -> list[Category]:
-    result = await session.exec(select(Category))
+    query = select(Category)
+    if only_active:
+        query = query.where(Category.is_active)
+    
+    query = query.order_by(Category.created_at.desc())
+    query = query.offset(offset).limit(limit)
+    result = await session.exec(query)
     return list(result.all())
 
 async def update_category(
@@ -71,6 +95,7 @@ async def update_category(
              )           
         raise e 
         
+    await session.refresh(category)
     return category
 
 async def remove_category(
@@ -121,10 +146,33 @@ async def add_brand(
         raise e 
     return new_brand
 
+async def get_brand(
+    session: AsyncSession,
+    brand_id: uuid.UUID,
+    only_active: bool
+) -> Brand:
+    query = select(Brand).where(Brand.brand_id == brand_id)
+    if only_active:
+        query = query.where(Brand.is_active)
+    
+    result = await session.exec(query)
+    brand = result.first()
+    if not brand:
+        raise BrandNotFoundError("Brand not found")
+    return brand
+
 async def get_all_brands(
     session: AsyncSession,
+    offset: int,
+    limit: int,
+    only_active: bool = True
 ) -> list[Brand]:
-    result = await session.exec(select(Brand))
+    query = select(Brand)
+    if only_active:
+        query = query.where(Brand.is_active)
+    query = query.order_by(Brand.created_at.desc())
+    query = query.offset(offset).limit(limit)
+    result = await session.exec(query)
     return list(result.all())
 
 async def update_brand(
@@ -156,7 +204,7 @@ async def update_brand(
              )           
         raise e 
         
-    
+    await session.refresh(brand)
     return brand
 
 async def remove_brand(

@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel, Field
 from pydantic import field_validator
+from datetime import datetime
 import uuid
 import re
 
@@ -45,11 +46,15 @@ class CategoryCreate(CategoryBase):
 
 class CategoryRead(CategoryBase):
     category_id: uuid.UUID
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
 
 class CategoryUpdate(HasNameMixin, HasCodeMixin, SQLModel):
     # Sobrescribe los campos para hacerlos opcionales.
     name: str | None = Field(default=None, min_length=3, max_length=30)
     code: str | None = Field(default=None, min_length=2, max_length=4)
+    is_active: bool | None = None
 
 class BrandBase(HasNameMixin, HasCodeMixin, SQLModel):
     pass
@@ -59,7 +64,11 @@ class BrandCreate(BrandBase):
 
 class BrandRead(BrandBase):
     brand_id: uuid.UUID
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
 
 class BrandUpdate(HasNameMixin, HasCodeMixin, SQLModel):
     name: str | None = Field(default=None, min_length=3, max_length=30)
     code: str | None = Field(default=None, min_length=2, max_length=4)
+    is_active: bool | None = None

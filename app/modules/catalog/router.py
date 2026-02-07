@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Query
 from app.modules.catalog.schemas import (
     CategoryCreate, 
     CategoryRead, 
@@ -9,7 +9,7 @@ from app.modules.catalog.schemas import (
 )
 from app.core.dependencies import SessionDep
 from app.modules.catalog import service as serv
-from app.core.dependencies import CurrentAdmin
+from app.core.dependencies import CurrentAdmin, CurrentUserOptional
 import uuid
 
 router = APIRouter()
@@ -27,15 +27,52 @@ async def create_category(
 ):
     return await serv.create_category(session, body)
 
+
+@router.get(
+    "/categories/{category_id}",
+    response_model=CategoryRead,
+    summary="Get a category by its id (Admins see all, Guests see active only)"
+)
+async def get_category(
+    session: SessionDep,
+    category_id: uuid.UUID,
+    user: CurrentUserOptional
+):
+    is_admin = False
+    
+    if user is not None and user.role == "admin":
+        is_admin = True
+    
+    should_filter_active = not is_admin 
+    return await serv.get_category(
+        session, 
+        category_id, 
+        only_active=should_filter_active
+    )
+
 @router.get(
     "/categories",
     response_model=list[CategoryRead],
-    summary="List all registered categories"
+    summary="List categories (Admins see all, Guests see active only)"
 )
 async def list_categories(
     session: SessionDep,
+    user: CurrentUserOptional,
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=10, ge=0, le=100)
 ):
-    return await serv.list_categories(session)
+    is_admin = False
+    
+    if user is not None and user.role == "admin":
+        is_admin = True
+    
+    should_filter_active = not is_admin 
+    return await serv.list_categories(
+        session, 
+        offset=offset, 
+        limit=limit, 
+        only_active=should_filter_active
+    )
 
 @router.patch(
     "/categories/{category_id}",
@@ -76,16 +113,52 @@ async def create_brand(
 ):
     return await serv.create_brand(session, body)
 
+
+@router.get(
+    "/brands/{brand_id}",
+    response_model=BrandRead,
+    summary="Get a brand by its id (Admins see all, Guests see active only)"
+)
+async def get_brand(
+    session: SessionDep,
+    brand_id: uuid.UUID,
+    user: CurrentUserOptional
+):
+    is_admin = False
+    
+    if user is not None and user.role == "admin":
+        is_admin = True
+    
+    should_filter_active = not is_admin 
+    return await serv.get_brand(
+        session, 
+        brand_id, 
+        only_active=should_filter_active
+    )
+
 @router.get(
     "/brands",
     response_model=list[BrandRead],
-    summary="List all registered brands"
+    summary="List brands (Admins see all, Guests see active only)"
 )
 async def list_brands(
-    session: SessionDep
+    session: SessionDep,
+    user: CurrentUserOptional,
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=10, ge=0, le=100)
 ):
-    return await serv.list_brands(session)
-
+    is_admin = False
+    
+    if user is not None and user.role == "admin":
+        is_admin = True
+    
+    should_filter_active = not is_admin 
+    return await serv.list_brands(
+        session, 
+        offset=offset, 
+        limit=limit, 
+        only_active=should_filter_active
+    )
 @router.patch(
     "/brands/{brand_id}",
     response_model=BrandRead,

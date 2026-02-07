@@ -16,11 +16,21 @@ async def create_category(
     new_category = Category.model_validate(category_data)
     
     return await repo.add_category(session, new_category)
+
+async def get_category(
+    session: AsyncSession,
+    category_id: uuid.UUID,
+    only_active: bool
+) -> Category:
+    return await repo.get_category(session, category_id, only_active)
     
 async def list_categories(
     session: AsyncSession,
+    offset: int,
+    limit: int,
+    only_active: bool
 ) -> list[Category]:
-    return await repo.get_all_categories(session)
+    return await repo.get_all_categories(session, offset, limit, only_active)
 
 async def edit_category(
     session: AsyncSession,
@@ -45,10 +55,20 @@ async def create_brand(
 
     return await repo.add_brand(session, new_brand)
 
+async def get_brand(
+    session: AsyncSession,
+    brand_id: uuid.UUID,
+    only_active: bool
+) -> Brand:
+    return await repo.get_brand(session, brand_id, only_active)
+
 async def list_brands(
     session: AsyncSession,
+    offset: int,
+    limit: int,
+    only_active: bool
 ) -> list[Brand]:
-    return await repo.get_all_brands(session)
+    return await repo.get_all_brands(session, offset, limit, only_active)
 
 async def edit_brand(
     session: AsyncSession,
