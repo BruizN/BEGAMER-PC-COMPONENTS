@@ -6,6 +6,7 @@ from httpx import AsyncClient, ASGITransport
 from sqlmodel import SQLModel
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
+from datetime import datetime
 
 
 
@@ -168,8 +169,14 @@ async def user_client(client, client_user):
 
 @pytest.fixture
 async def category_factory(db_session):
-    async def _create_category(name: str, code: str):
-        category = Category(name=name.title(), code=code.upper()) #Reglas de negocio
+    async def _create_category(
+        name: str, code: str, is_active: bool = True, 
+        created_at: datetime | None = None, updated_at: datetime | None = None
+        ):
+        category = Category(
+            name=name.title(), code=code.upper(), is_active=is_active, 
+            created_at=created_at, updated_at=updated_at
+            ) #Reglas de negocio
         db_session.add(category)
         await db_session.commit()
         await db_session.refresh(category)
@@ -178,8 +185,15 @@ async def category_factory(db_session):
 
 @pytest.fixture
 async def brand_factory(db_session):
-    async def _create_brand(name: str, code: str):
-        brand = Brand(name=name.title(), code=code.upper()) 
+    async def _create_brand(
+        name: str, code: str, is_active: bool = True, 
+        created_at: datetime | None = None, updated_at: datetime | None = None
+        ):
+
+        brand = Brand(
+            name=name.title(), code=code.upper(), is_active=is_active, 
+            created_at=created_at, updated_at=updated_at
+            ) 
         db_session.add(brand)
         await db_session.commit()
         await db_session.refresh(brand)
