@@ -10,11 +10,11 @@ workspace {
             # Le dice a Structurizr que busque la documentación dentro de estas carpetas
             !docs docs
             !adrs adrs
-            api = container "API Backend" "Maneja la autenticación (Login) y autorización." "Python 3.11 slim + FastAPI" {
+            api = container "API Backend" "Maneja la autenticación, autorización, y la lógica de negocio del catálogo." "Python 3.13 slim + FastAPI" {
                 tags "API"
             }
 
-            database = container "Base de Datos" "Almacena usuarios, roles y hashes de contraseñas." "PostgreSQL 15-alpine" {
+            database = container "Base de Datos" "Almacena usuarios, roles, hashes de contraseñas, productos, marcas y categorías." "PostgreSQL 15-alpine" {
                 tags "Database"
             }
         }
@@ -25,19 +25,16 @@ workspace {
         sii = softwareSystem "Servicio Impuestos Internos (Mock)" "Simula la validación y emisión de boletas para fines académicos." "External System"
         email_system = softwareSystem "Sistema de Correo" "Envía confirmaciones de órdenes y recuperación de claves." "External System"
    
-        # --- Relaciones ---
+        # --- Relaciones nivel 1 ---
         cliente -> ecommerce "Busca componentes y compra"
         admin -> ecommerce "Gestiona inventario"
-        
         ecommerce -> webpay "Inicia transacción y valida estado"
         ecommerce -> sii "Solicita folio y timbre electrónico (Simulado)"
         ecommerce -> email_system "Envía correos electrónicos a clientes"
-        # 1. El Admin intenta entrar
-        admin -> api "Interactúa vía Swagger UI para enviar credenciales con rol de administrador" "HTTPS/JSON"
-        cliente -> api "Interactúa vía Swagger UI para enviar credenciales con rol de client" "HTTPS/JSON"
-        
-        # 2. La API verifica quién es
-        api -> database "Selecciona usuario y hash de contraseña" "SQL/SQLModel"
+        # --- Relaciones nivel 2 ---
+        admin -> api "Gestiona Categorías, Marcas y Productos (Swagger UI)" "HTTPS/JSON"
+        cliente -> api "Consulta Productos Disponibles (Swagger UI)" "HTTPS/JSON"
+        api -> database "Lee/Escribe datos del catálogo y usuarios" "SQL/SQLModel"
 
 
     }
