@@ -59,3 +59,4 @@ uuid6==2025.0.1
 uvicorn==0.40.0
 watchfiles==1.1.1
 websockets==15.0.1
+python-slugify==8.0.4
