@@ -5,29 +5,45 @@
 ```mermaid
 erDiagram
     user {
-        UUID user_id PK "UUIDv7 (Time-sortable)"
-        VARCHAR email UK "Unique, Not Null"
-        VARCHAR hashed_password "Not Null"
-        VARCHAR role "Default: 'client'"
-        BOOLEAN is_active "Default: true"
-        DATETIME created_at "Server Default: now()"
-        DATETIME updated_at "OnUpdate: now()"
+        UUID user_id PK "UUIDv7"
+        VARCHAR email UK "Unique"
+        VARCHAR hashed_password
+        VARCHAR role
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
     }
 
     category {
-        UUID category_id PK "UUIDv7 (Time-sortable)"
-        VARCHAR name UK "Unique, Not Null"
-        VARCHAR code UK "Unique, Not Null"
-        BOOLEAN is_active "Default: true"
-        DATETIME created_at "Server Default: now()"
-        DATETIME updated_at "OnUpdate: now()"
+        UUID category_id PK "UUIDv7"
+        VARCHAR name UK
+        VARCHAR code UK "Ej: GPU"
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
     }
 
     brand {
-        UUID brand_id PK "UUIDv7 (Time-sortable)"
-        VARCHAR name UK "Unique, Not Null"
-        VARCHAR code UK "Unique, Not Null"
-        BOOLEAN is_active "Default: true"
-        DATETIME created_at "Server Default: now()"
-        DATETIME updated_at "OnUpdate: now()"
+        UUID brand_id PK "UUIDv7"
+        VARCHAR name UK
+        VARCHAR code UK "Ej: ASU"
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
     }
+
+    product {
+        UUID product_id PK "UUIDv7"
+        VARCHAR name UK "Unique"
+        VARCHAR model_slug UK "Unique, Index"
+        TEXT description
+        UUID category_id FK
+        UUID brand_id FK
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    %% Relaciones
+    category ||--|{ product : "clasifica a"
+    brand    ||--|{ product : "fabrica a"
