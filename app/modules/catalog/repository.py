@@ -2,14 +2,16 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel import select
 from sqlalchemy.exc import IntegrityError
 import uuid
-from app.modules.catalog.models import Category, Brand
+from app.modules.catalog.models import Category, Brand, Product
 from app.modules.catalog.exceptions import (
     CategoryAlreadyExistsError, 
     CategoryNotFoundError, 
     CategoryNotEmptyError,
     BrandAlreadyExistsError,
     BrandNotFoundError,
-    BrandNotEmptyError
+    BrandNotEmptyError,
+    ProductAlreadyExistsError,
+    ProductNotFoundError,
     )
 
 async def add_category(
@@ -229,3 +231,28 @@ async def remove_brand(
         raise e
 
     return  
+
+async def add_product(
+    session: AsyncSession,
+    new_product: Product
+) -> Product:
+    session.add(new_product)
+    try:
+        await session.flush()
+    except IntegrityError as e:
+        error_msg = str(e.orig) 
+
+        if "name" in error_msg: 
+             raise ProductAlreadyExistsError(
+                f"The product with the name '{new_product.name}' already exists."
+             )
+
+        elif "slug" in error_msg:
+             raise ProductAlreadyExistsError(
+                f"The product with the slug '{new_product.slug}' already exists."
+             )           
+             
+        raise e 
+
+    await session.refresh(new_product, ["category", "brand"])
+    return new_product

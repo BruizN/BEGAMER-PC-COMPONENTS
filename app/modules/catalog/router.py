@@ -5,7 +5,10 @@ from app.modules.catalog.schemas import (
     CategoryUpdate,
     BrandCreate,
     BrandRead,
-    BrandUpdate
+    BrandUpdate,
+    ProductCreate,
+    ProductRead,
+    ProductUpdate
 )
 from app.core.dependencies import SessionDep
 from app.modules.catalog import service as serv
@@ -184,3 +187,16 @@ async def delete_brand(
 ):
     await serv.delete_brand(session, brand_id)
     return
+
+@router.post(
+    "/products",
+    response_model=ProductRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a new product for your catalog"
+)
+async def create_product(
+    session: SessionDep,
+    admin: CurrentAdmin,
+    body: ProductCreate
+):
+    return await serv.create_product(session, body)

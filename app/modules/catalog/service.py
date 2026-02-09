@@ -1,12 +1,15 @@
 from app.modules.catalog import repository as repo
-from app.modules.catalog.models import Category, Brand
+from app.modules.catalog.models import Category, Brand, Product
 from app.modules.catalog.schemas import (
     CategoryCreate, 
     CategoryUpdate,
     BrandCreate,
-    BrandUpdate
+    BrandUpdate,
+    ProductCreate,
+    ProductUpdate
 )
 from sqlmodel.ext.asyncio.session import AsyncSession
+from slugify import slugify
 import uuid
 
 async def create_category(
@@ -84,3 +87,29 @@ async def delete_brand(
 ) -> None:
     await repo.remove_brand(session, brand_id)
     return 
+
+async def create_product(
+    session: AsyncSession,
+    product_data: ProductCreate
+) -> Product:
+    brand = await repo.get_brand(session, product_data.brand_id, True)
+    category = await repo.get_category(session, product_data.category_id, True)
+
+    nombre_producto = product_data.name
+    nombre_marca = brand.name
+
+    # Si el nombre del producto ya empieza con la marca, no se agrega la marca de nuevo
+    if nombre_producto.lower().startswith(nombre_marca.lower()):
+        slug_text = f"{category.code} {nombre_producto}" 
+    else:
+        slug_text = f"{category.code} {nombre_marca} {nombre_producto}"
+
+    generated_slug = slugify(slug_text)
+
+    new_product = Product.model_validate(
+        product_data,
+        update={
+            "slug": generated_slug
+        }
+    )
+    return await repo.add_product(session, new_product)
