@@ -7,6 +7,8 @@ from app.modules.catalog.exceptions import (
     BrandNotFoundError,
     BrandAlreadyExistsError,
     BrandNotEmptyError,
+    ProductNotFoundError,
+    ProductAlreadyExistsError
 
 )
 
@@ -27,3 +29,10 @@ async def brand_exists_handler(request: Request, exc: BrandAlreadyExistsError):
 
 async def brand_not_empty_handler(request: Request, exc: BrandNotEmptyError):
     return JSONResponse(status_code=409, content={"detail": str(exc)})
+
+async def product_not_found_handler(request: Request, exc: ProductNotFoundError):
+    return JSONResponse(status_code=404, content={"detail": str(exc)})
+
+async def product_exists_handler(request: Request, exc: ProductAlreadyExistsError):
+    return JSONResponse(status_code=409, content={"detail": str(exc)})
+

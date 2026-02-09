@@ -25,3 +25,11 @@ class BrandAlreadyExistsError(CatalogError):
 class BrandNotEmptyError(CatalogError):
     """Se lanza al intentar borrar una marca con productos hijos"""
     pass
+
+class ProductNotFoundError(CatalogError):
+    """Se lanza cuando no se encuentra el producto"""
+    pass
+
+class ProductAlreadyExistsError(CatalogError):
+    """Se lanza cuando se intenta crear un producto duplicado"""
+    pass
