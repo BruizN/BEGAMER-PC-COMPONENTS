@@ -72,3 +72,28 @@ class BrandUpdate(HasNameMixin, HasCodeMixin, SQLModel):
     name: str | None = Field(default=None, min_length=3, max_length=30)
     code: str | None = Field(default=None, min_length=2, max_length=4)
     is_active: bool | None = None
+
+
+class ProductBase(SQLModel):
+    name: str = Field(unique=True, min_length=3, max_length=100)
+    description: str | None = None
+    category_id: uuid.UUID 
+    brand_id: uuid.UUID
+
+class ProductCreate(ProductBase):
+    pass
+
+class ProductRead(ProductBase):
+    product_id: uuid.UUID
+    slug: str
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
+    category: CategoryRead
+    brand: BrandRead
+
+class ProductUpdate(SQLModel):
+    name: str | None = Field(default=None, min_length=3, max_length=100)
+    description: str | None = None
+    category_id: uuid.UUID | None = None
+    brand_id: uuid.UUID | None = None
