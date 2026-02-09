@@ -200,3 +200,49 @@ async def create_product(
     body: ProductCreate
 ):
     return await serv.create_product(session, body)
+
+@router.get(
+    "/products/{product_id}",
+    response_model=ProductRead,
+    summary="Get a product by its id (Admins see all, Guests see active only)"
+)
+async def get_product(
+    session: SessionDep,
+    product_id: uuid.UUID,
+    user: CurrentUserOptional
+):
+    is_admin = False
+    
+    if user is not None and user.role == "admin":
+        is_admin = True
+    
+    should_filter_active = not is_admin 
+    return await serv.get_product(
+        session, 
+        product_id, 
+        only_active=should_filter_active
+    )
+
+@router.get(
+    "/products",
+    response_model=list[ProductRead],
+    summary="List products (Admins see all, Guests see active only)"
+)
+async def list_products(
+    session: SessionDep,
+    user: CurrentUserOptional,
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=10, ge=0, le=100)
+):
+    is_admin = False
+    
+    if user is not None and user.role == "admin":
+        is_admin = True
+    
+    should_filter_active = not is_admin 
+    return await serv.list_products(
+        session, 
+        offset=offset, 
+        limit=limit, 
+        only_active=should_filter_active
+    )

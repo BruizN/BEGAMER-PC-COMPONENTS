@@ -113,3 +113,19 @@ async def create_product(
         }
     )
     return await repo.add_product(session, new_product)
+
+async def get_product(
+    session: AsyncSession,
+    product_id: uuid.UUID,
+    only_active: bool
+) -> Product:
+    return await repo.get_product(session, product_id, only_active)
+
+async def list_products(
+    session: AsyncSession,
+    offset: int,
+    limit: int,
+    only_active: bool
+) -> list[Product]:
+    return await repo.get_all_products(session, offset, limit, only_active)
+
