@@ -1,8 +1,8 @@
 """product table and relationships
 
-Revision ID: e966105c68d4
+Revision ID: 2962fae893fa
 Revises: dc9f3ea0f047
-Create Date: 2026-02-09 12:15:25.624969
+Create Date: 2026-02-10 10:47:22.711502
 
 """
 from typing import Sequence, Union
@@ -13,7 +13,7 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'e966105c68d4'
+revision: str = '2962fae893fa'
 down_revision: Union[str, Sequence[str], None] = 'dc9f3ea0f047'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
