@@ -336,3 +336,27 @@ async def update_product(
 
     await session.refresh(product, ["category", "brand", "updated_at"])
     return product
+
+
+async def remove_product(
+    session: AsyncSession,
+    product_id: uuid.UUID
+) -> None:
+    product = await session.get(Product, product_id)
+
+    if not product:
+        raise ProductNotFoundError("Product not found")
+    
+    await session.delete(product)
+
+    try:
+        await session.flush()
+
+    except IntegrityError as e:
+        if "foreign key constraint" in str(e.orig):
+            raise ProductNotEmptyError(
+                "Cannot delete product: The product contains variants associated. Please archive the product instead."
+                )
+        raise e
+
+    return  

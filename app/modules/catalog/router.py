@@ -259,3 +259,16 @@ async def edit_product(
     body: ProductUpdate
 ):
     return await serv.edit_product(session, product_id, body)
+
+@router.delete(
+    "/products/{product_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete an existing product by its id, if the product has variants, it will not be deleted"
+)
+async def delete_product(
+    session: SessionDep,
+    admin: CurrentAdmin,
+    product_id: uuid.UUID
+):
+    await serv.delete_product(session, product_id)
+    return

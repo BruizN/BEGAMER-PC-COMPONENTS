@@ -170,3 +170,11 @@ async def edit_product(
         update_data["slug"] = new_slug
 
     return await repo.update_product(session, product_id, update_data)
+
+
+async def delete_product(
+    session: AsyncSession,
+    product_id: uuid.UUID
+) -> None:
+    await repo.remove_product(session, product_id)
+    return
