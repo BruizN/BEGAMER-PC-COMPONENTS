@@ -121,7 +121,7 @@ async def remove_category(
 
     except IntegrityError as e:
         if "foreign key constraint" in str(e.orig):
-            raise CategoryNotEmptyError("Cannot be deleted: The category contains products.")
+            raise CategoryNotEmptyError("Cannot delete category: The category contains products. Please archive the category instead.")
         raise e
 
     return
@@ -227,7 +227,7 @@ async def remove_brand(
     except IntegrityError as e:
         if "foreign key constraint" in str(e.orig):
             raise BrandNotEmptyError(
-                "Cannot be deleted: The brand contains products."
+                "Cannot delete brand: The brand contains products. Please archive the brand instead."
                 )
         raise e
 
