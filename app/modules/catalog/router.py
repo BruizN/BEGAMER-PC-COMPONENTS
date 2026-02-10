@@ -246,3 +246,16 @@ async def list_products(
         limit=limit, 
         only_active=should_filter_active
     )
+
+@router.patch(
+    "/products/{product_id}",
+    response_model=ProductRead,
+    summary="Update an existing product by its id"
+)
+async def edit_product(
+    session: SessionDep,
+    admin: CurrentAdmin,
+    product_id: uuid.UUID,
+    body: ProductUpdate
+):
+    return await serv.edit_product(session, product_id, body)

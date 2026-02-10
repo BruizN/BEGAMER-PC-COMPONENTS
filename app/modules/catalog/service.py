@@ -129,3 +129,44 @@ async def list_products(
 ) -> list[Product]:
     return await repo.get_all_products(session, offset, limit, only_active)
 
+async def edit_product(
+    session: AsyncSession,
+    product_id: uuid.UUID,
+    edit_product_data: ProductUpdate
+) -> Product:
+
+    # Obtener el producto actual
+    current_product = await repo.get_product(session, product_id, False)
+
+    update_data = edit_product_data.model_dump(exclude_unset=True)
+
+    # Detectar si hay que recalcular el slug
+    has_name_changed = "name" in update_data
+    has_brand_changed = "brand_id" in update_data
+    has_category_changed = "category_id" in update_data
+
+    if has_name_changed or has_brand_changed or has_category_changed:
+        
+        # Resolver cual es el nombre definitivo
+        effective_name = update_data.get("name", current_product.name)
+
+        # Resolver cual es la marca definitiva (ID)
+        effective_brand_id = update_data.get("brand_id", current_product.brand_id)
+        effective_category_id = update_data.get("category_id", current_product.category_id)
+
+        brand = await repo.get_brand(session, effective_brand_id, False)
+        category = await repo.get_category(session, effective_category_id, False)
+        
+        brand_name_lower = brand.name.lower()
+        product_name_lower = effective_name.lower()
+        
+        if product_name_lower.startswith(brand_name_lower):
+            slug_text = f"{category.code} {effective_name}"
+        else:
+            slug_text = f"{category.code} {brand.name} {effective_name}"
+            
+        new_slug = slugify(slug_text)
+        
+        update_data["slug"] = new_slug
+
+    return await repo.update_product(session, product_id, update_data)

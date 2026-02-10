@@ -303,3 +303,36 @@ async def get_all_products(
     
     result = await session.exec(query)
     return list(result.unique().all())
+
+async def update_product(
+    session: AsyncSession,
+    product_id: uuid.UUID,
+    update_data: dict
+) -> Product:
+    product = await session.get(Product, product_id)
+
+    if not product:
+        raise ProductNotFoundError("Product not found")
+
+    product.sqlmodel_update(update_data)
+
+    session.add(product)
+    try:
+        await session.flush()
+    except IntegrityError as e:
+        error_msg = str(e.orig) 
+
+        if "name" in error_msg: 
+             raise ProductAlreadyExistsError(
+                f"The product with the name '{update_data["name"]}' already exists."
+             )
+
+        elif "slug" in error_msg:
+             raise ProductAlreadyExistsError(
+                f"The product with the slug '{update_data["slug"]}' already exists."
+             )           
+             
+        raise e 
+
+    await session.refresh(product, ["category", "brand", "updated_at"])
+    return product
