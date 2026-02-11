@@ -121,11 +121,16 @@ async def test_update_categories_ok(
     assert data["name"] == "Tarjeta De Video"
     assert not data["is_active"]
 
-async def test_delete_categories_ok(
+
+#Comprobar eliminación de una categoría sin y con productos asociados
+async def test_delete_categories(
     admin_client,
-    category_factory
+    category_factory,
+    product_factory,
+    brand_factory
 ):
-    category = await category_factory(name="proce", code="prc")
+
+    category = await category_factory(name="procesador", code="cpu")
 
     response = await admin_client.delete(
         f"/catalog/categories/{category.category_id}"
@@ -133,7 +138,21 @@ async def test_delete_categories_ok(
     
     assert response.status_code == 204
 
+    #Comprobar que no se puede eliminar una categoría que tenga productos
+    category2 = await category_factory(name="tarjeta de video", code="gpu")
+    brand = await brand_factory(name="zotac", code="zot")
+    await product_factory(
+        name="Gaming GeForce RTX 4070 Twin Edge", 
+        description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
+        category=category2, 
+        brand=brand
+        )
 
+    response = await admin_client.delete(
+        f"/catalog/categories/{category2.category_id}"
+        )
+    
+    assert response.status_code == 409
 
 async def test_deny_duplicated_category_creation(
     admin_client,
@@ -174,17 +193,15 @@ async def test_deny_duplicated_category_mofication(
 
 
 #Comprobar denegación inmediata a usuarios clientes
-@pytest.mark.parametrize("endpoint, method, status", [
-    ("/catalog/categories", "post", 403),
-    ("/catalog/categories", "get", 200),
-    ("/catalog/categories/999", "patch", 403),
-    ("/catalog/categories/999", "delete", 403),
+@pytest.mark.parametrize("endpoint, method", [
+    ("/catalog/categories", "post"),
+    ("/catalog/categories/999", "patch"),
+    ("/catalog/categories/999", "delete"),
 ])
 async def test_category_permissions_for_client(
     user_client,
     endpoint,
     method,
-    status,
 ):
 
     request_func = getattr(user_client, method)
@@ -192,4 +209,4 @@ async def test_category_permissions_for_client(
     response = await request_func(
         endpoint
     )
-    assert response.status_code == status
+    assert response.status_code == 403
