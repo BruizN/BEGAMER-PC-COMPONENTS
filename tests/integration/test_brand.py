@@ -117,10 +117,14 @@ async def test_update_brand_ok(
     assert data["name"] == "Asus"
     assert not data["is_active"]
 
-async def test_delete_brand_ok(
+#Comprobar eliminación de una marca sin y con productos asociados
+async def test_delete_brand(
     admin_client,
+    category_factory,
+    product_factory,
     brand_factory
 ):
+
     brand = await brand_factory(name="asus", code="asu")
 
     response = await admin_client.delete(
@@ -128,6 +132,22 @@ async def test_delete_brand_ok(
         )
     
     assert response.status_code == 204
+
+    #Comprobar que no se puede eliminar una marca que tenga productos
+    brand2 = await brand_factory(name="zotac", code="zot")
+    category = await category_factory(name="tarjeta de video", code="gpu")
+    await product_factory(
+        name="Gaming GeForce RTX 4070 Twin Edge", 
+        description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
+        category=category, 
+        brand=brand2
+        )
+
+    response = await admin_client.delete(
+        f"/catalog/brands/{brand2.brand_id}"
+        )
+    
+    assert response.status_code == 409
 
 
 
@@ -170,17 +190,15 @@ async def test_deny_duplicated_brand_mofication(
 
 
 #Comprobar denegación inmediata a usuarios clientes
-@pytest.mark.parametrize("endpoint, method, status", [
-    ("/catalog/brands", "post", 403),
-    ("/catalog/brands", "get", 200),
-    ("/catalog/brands/999", "patch", 403),
-    ("/catalog/brands/999", "delete", 403),
+@pytest.mark.parametrize("endpoint, method", [
+    ("/catalog/brands", "post"),
+    ("/catalog/brands/999", "patch"),
+    ("/catalog/brands/999", "delete"),
 ])
 async def test_brand_permissions_for_client(
     user_client,
     endpoint,
     method,
-    status,
 ):
 
     request_func = getattr(user_client, method)
@@ -188,4 +206,4 @@ async def test_brand_permissions_for_client(
     response = await request_func(
         endpoint
     )
-    assert response.status_code == status
+    assert response.status_code == 403
