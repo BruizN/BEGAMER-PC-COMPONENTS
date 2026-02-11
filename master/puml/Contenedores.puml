@@ -12,13 +12,13 @@ Person(Cliente, "Cliente", $descr="Persona interesada en armar o mejorar su PC."
 Person(Administrador, "Administrador", $descr="Gestiona el stock y los precios de componentes.", $tags="", $link="")
 
 System_Boundary("BEGamerComponents_boundary", "BEGamer Components", $tags="") {
-  Container(BEGamerComponents.APIBackend, "API Backend", $techn="Python 3.11 slim + FastAPI", $descr="Maneja la autenticación (Login) y autorización.", $tags="", $link="")
-  ContainerDb(BEGamerComponents.BasedeDatos, "Base de Datos", $techn="PostgreSQL 15-alpine", $descr="Almacena usuarios, roles y hashes de contraseñas.", $tags="", $link="")
+  Container(BEGamerComponents.APIBackend, "API Backend", $techn="Python 3.13 slim + FastAPI", $descr="Maneja la autenticación, autorización, y la lógica de negocio del catálogo.", $tags="", $link="")
+  ContainerDb(BEGamerComponents.BasedeDatos, "Base de Datos", $techn="PostgreSQL 15-alpine", $descr="Almacena usuarios, roles, hashes de contraseñas, productos, marcas y categorías.", $tags="", $link="")
 }
 
-Rel(Administrador, BEGamerComponents.APIBackend, "Interactúa vía Swagger UI para enviar credenciales con rol de administrador", $techn="HTTPS/JSON", $tags="", $link="")
-Rel(Cliente, BEGamerComponents.APIBackend, "Interactúa vía Swagger UI para enviar credenciales con rol de client", $techn="HTTPS/JSON", $tags="", $link="")
-Rel(BEGamerComponents.APIBackend, BEGamerComponents.BasedeDatos, "Selecciona usuario y hash de contraseña", $techn="SQL/SQLModel", $tags="", $link="")
+Rel(Administrador, BEGamerComponents.APIBackend, "Gestiona Categorías, Marcas y Productos (Swagger UI)", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(Cliente, BEGamerComponents.APIBackend, "Consulta Productos Disponibles (Swagger UI)", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend, BEGamerComponents.BasedeDatos, "Lee/Escribe datos del catálogo y usuarios", $techn="SQL/SQLModel", $tags="", $link="")
 
 SHOW_LEGEND(true)
 @enduml
