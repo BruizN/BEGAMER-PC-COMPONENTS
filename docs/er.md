@@ -1,4 +1,4 @@
-# Modelo de Datos (Iteración 1: Autenticación)
+# Modelo de Datos (Iteración actual)
 
 **Nota de Diseño:** Se utiliza UUIDv7 para la Clave Primaria. Esto permite mantener la base de datos indexada eficientemente por tiempo, evitando la fragmentación que producen los UUIDv4 aleatorios.
 
