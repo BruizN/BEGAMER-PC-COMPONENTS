@@ -354,7 +354,7 @@ async def remove_product(
 
     except IntegrityError as e:
         if "foreign key constraint" in str(e.orig):
-            raise ProductNotEmptyError(
+            raise ProductNotEmptyError( # noqa: F821
                 "Cannot delete product: The product contains variants associated. Please archive the product instead."
                 )
         raise e

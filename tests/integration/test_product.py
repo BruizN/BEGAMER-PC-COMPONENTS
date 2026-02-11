@@ -46,7 +46,7 @@ async def test_list_products_ok(
 ):
     brand1 = await brand_factory(name="zotac", code="zot")
     cat1 = await category_factory(name="tarjeta de video", code="gpu")
-    prod1 = await product_factory(
+    await product_factory(
         name="Gaming GeForce RTX 4070 Twin Edge", 
         description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
         category=cat1, 
@@ -56,7 +56,7 @@ async def test_list_products_ok(
 
     brand2 = await brand_factory(name="intel", code="int")
     cat2 = await category_factory(name="Procesador", code="cpu")
-    prod2 = await product_factory(
+    await product_factory(
         name="Core i9-14900K", 
         description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
         category=cat2, 
@@ -66,7 +66,7 @@ async def test_list_products_ok(
 
     brand3 = await brand_factory(name="helios", code="hel")
     cat3 = await category_factory(name="fuente de poder", code="psu")
-    prod3 = await product_factory(
+    await product_factory(
         name="Helios 1000W 80 Plus Gold", 
         description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
         category=cat3, 
@@ -89,7 +89,7 @@ async def test_list_products_user_ok(
 ):
     brand1 = await brand_factory(name="zotac", code="zot")
     cat1 = await category_factory(name="tarjeta de video", code="gpu")
-    prod1 = await product_factory(
+    await product_factory(
         name="Gaming GeForce RTX 4070 Twin Edge", 
         description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
         category=cat1, 
@@ -99,7 +99,7 @@ async def test_list_products_user_ok(
 
     brand2 = await brand_factory(name="intel", code="int")
     cat2 = await category_factory(name="Procesador", code="cpu")
-    prod2 = await product_factory(
+    await product_factory(
         name="Core i9-14900K", 
         description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
         category=cat2, 
@@ -109,7 +109,7 @@ async def test_list_products_user_ok(
 
     brand3 = await brand_factory(name="helios", code="hel")
     cat3 = await category_factory(name="fuente de poder", code="psu")
-    prod3 = await product_factory(
+    await product_factory(
         name="Helios 1000W 80 Plus Gold", 
         description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
         category=cat3, 
@@ -257,7 +257,7 @@ async def test_deny_duplicated_product_creation(
 ):
     brand = await brand_factory(name="intel", code="int")
     cat = await category_factory(name="procesador", code="cpu")
-    prod = await product_factory(
+    await product_factory(
         name="Core i9-14900K", 
         description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
         category=cat, brand=brand
@@ -291,7 +291,7 @@ async def test_deny_duplicated_product_mofication(
         )
     
     # Crea el producto "rival" (el que ya tiene el nombre ocupado)
-    prod2 = await product_factory(
+    await product_factory(
         name="Core i5-14600K", 
         description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
         category=cat, brand=brand
