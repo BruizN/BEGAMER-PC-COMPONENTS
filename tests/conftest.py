@@ -202,7 +202,7 @@ async def brand_factory(db_session):
     return _create_brand
 
 @pytest.fixture
-async def product_factory(db_session, category_factory, brand_factory):
+async def product_factory(db_session):
     async def _create_product(
         name: str, 
         description: str, 
