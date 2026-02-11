@@ -178,7 +178,7 @@ async def test_admin_get_product_by_id(
     assert response.status_code == 200
 
 
-#Comprobar actualización parcial de un producto y soft delete
+#Comprobar actualización parcial de un producto, soft delete y slug
 async def test_update_product_ok(
     admin_client,
     brand_factory,
@@ -199,6 +199,7 @@ async def test_update_product_ok(
     )
     
     #Debido a como sqlalchemy actualiza los campos, guardamos el valor original en una variable aparte
+    original_slug = product.slug
     original_updated_at = product.updated_at
     original_id = str(product.product_id)
 
@@ -210,6 +211,8 @@ async def test_update_product_ok(
         )
 
     assert response.status_code == 200
+    assert response.json()["slug"] != original_slug
+    assert response.json()["slug"] == "cpu-amd-ryzen-9-7950x"
     data = response.json()
     
     response_updated_at = datetime.fromisoformat(data["updated_at"])
