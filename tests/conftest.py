@@ -7,6 +7,7 @@ from sqlmodel import SQLModel
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
 from datetime import datetime
+from slugify import slugify
 
 
 
@@ -14,7 +15,7 @@ from app.main import app
 from app.core.db import get_db 
 from app.core.security import hash_password, create_access_token
 from app.modules.auth.models import User
-from app.modules.catalog.models import Category, Brand
+from app.modules.catalog.models import Category, Brand, Product
 
 load_dotenv()
 
@@ -199,3 +200,40 @@ async def brand_factory(db_session):
         await db_session.refresh(brand)
         return brand
     return _create_brand
+
+@pytest.fixture
+async def product_factory(db_session, category_factory, brand_factory):
+    async def _create_product(
+        name: str, 
+        description: str, 
+        category: Category, 
+        brand: Brand, 
+        is_active: bool = True, 
+        created_at: datetime | None = None, 
+        updated_at: datetime | None = None
+        ):
+
+        nombre_producto = name
+        nombre_marca = brand.name
+
+        if nombre_producto.lower().startswith(nombre_marca.lower()):
+            slug_text = f"{category.code} {nombre_producto}" 
+        else:
+            slug_text = f"{category.code} {nombre_marca} {nombre_producto}"
+
+        generated_slug = slugify(slug_text)
+        product = Product(
+            name=name, 
+            description=description, 
+            slug=generated_slug, 
+            category_id=category.category_id, 
+            brand_id=brand.brand_id, 
+            is_active=is_active, 
+            created_at=created_at, 
+            updated_at=updated_at
+            )
+        db_session.add(product)
+        await db_session.commit()
+        await db_session.refresh(product)
+        return product
+    return _create_product
