@@ -1,45 +1,11 @@
 from sqlmodel import SQLModel, Field
-from pydantic import field_validator
+from app.core.types import CleanText, CleanCode
 from datetime import datetime
 import uuid
-import re
 
-
-class HasCodeMixin(SQLModel):
-    code: str = Field(unique=True, index=True, min_length=2, max_length=4)
-
-    @field_validator("code")
-    @classmethod
-    def validate_code(cls, v: str | None) -> str | None:
-        # Si es None (en un PATCH), retornasin validar
-        if v is None:
-            return v
-            
-        v = v.upper().strip()
-        if not (2 <= len(v) <= 4):
-            raise ValueError("The code must be between 2 and 4 characters long.")
-        if not re.match("^[A-Z0-9]+$", v):
-            raise ValueError("The code can only contain letters and numbers.")
-        return v
-
-class HasNameMixin(SQLModel):
-    name: str = Field(unique=True, index=True, min_length=3, max_length=30)
-
-    @field_validator("name")
-    @classmethod
-    def validate_name(cls, v: str | None) -> str | None:
-        if v is None:
-            return v
-            
-        v = v.title().strip()
-        if not (3 <= len(v) <= 30):
-            raise ValueError("The name must be between 3 and 30 characters long.")
-
-        return v
-
-
-class CategoryBase(HasNameMixin, HasCodeMixin, SQLModel):
-    pass
+class CategoryBase(SQLModel):
+    name: CleanText = Field(min_length=3, max_length=50)
+    code: CleanCode = Field(min_length=2, max_length=4)
 
 class CategoryCreate(CategoryBase):
     pass
@@ -50,14 +16,15 @@ class CategoryRead(CategoryBase):
     created_at: datetime
     updated_at: datetime
 
-class CategoryUpdate(HasNameMixin, HasCodeMixin, SQLModel):
+class CategoryUpdate(SQLModel):
     # Sobrescribe los campos para hacerlos opcionales.
-    name: str | None = Field(default=None, min_length=3, max_length=30)
-    code: str | None = Field(default=None, min_length=2, max_length=4)
+    name: CleanText | None = Field(default=None, min_length=3, max_length=50)
+    code: CleanCode | None = Field(default=None, min_length=2, max_length=4)
     is_active: bool | None = None
 
-class BrandBase(HasNameMixin, HasCodeMixin, SQLModel):
-    pass
+class BrandBase(SQLModel):
+    name: CleanText = Field(min_length=3, max_length=50)
+    code: CleanCode = Field(min_length=2, max_length=4)
 
 class BrandCreate(BrandBase):
     pass
@@ -68,14 +35,14 @@ class BrandRead(BrandBase):
     created_at: datetime
     updated_at: datetime
 
-class BrandUpdate(HasNameMixin, HasCodeMixin, SQLModel):
-    name: str | None = Field(default=None, min_length=3, max_length=30)
-    code: str | None = Field(default=None, min_length=2, max_length=4)
+class BrandUpdate(SQLModel):
+    name: CleanText | None = Field(default=None, min_length=3, max_length=50)
+    code: CleanCode | None = Field(default=None, min_length=2, max_length=4)
     is_active: bool | None = None
 
 
 class ProductBase(SQLModel):
-    name: str = Field(unique=True, min_length=3, max_length=100)
+    name: CleanText = Field(min_length=3, max_length=150)
     description: str | None = None
     category_id: uuid.UUID 
     brand_id: uuid.UUID
@@ -93,8 +60,8 @@ class ProductRead(ProductBase):
     brand: BrandRead
 
 class ProductUpdate(SQLModel):
-    name: str | None = Field(default=None, min_length=3, max_length=100)
-    description: str | None = None
+    name: CleanText | None = Field(default=None, min_length=3, max_length=150)
+    description: CleanText | None = None
     category_id: uuid.UUID | None = None
     brand_id: uuid.UUID | None = None
     is_active: bool | None = None
