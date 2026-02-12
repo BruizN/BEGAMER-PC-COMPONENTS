@@ -175,7 +175,7 @@ async def category_factory(db_session):
         created_at: datetime | None = None, updated_at: datetime | None = None
         ):
         category = Category(
-            name=name.title(), code=code.upper(), is_active=is_active, 
+            name=name, code=code.upper(), is_active=is_active, 
             created_at=created_at, updated_at=updated_at
             ) #Reglas de negocio
         db_session.add(category)
@@ -192,7 +192,7 @@ async def brand_factory(db_session):
         ):
 
         brand = Brand(
-            name=name.title(), code=code.upper(), is_active=is_active, 
+            name=name, code=code.upper(), is_active=is_active, 
             created_at=created_at, updated_at=updated_at
             ) 
         db_session.add(brand)

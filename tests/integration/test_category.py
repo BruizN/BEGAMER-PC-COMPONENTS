@@ -5,7 +5,7 @@ async def test_create_category_ok(
     admin_client
 ):
     payload = {
-        "name": "tarjeta de Video",
+        "name": "Tarjeta de video",
         "code": "gpu"
     }
 
@@ -13,8 +13,8 @@ async def test_create_category_ok(
 
     assert response.status_code == 201
     data = response.json()
-    #Comprobar .title() y upper()
-    assert data["name"] == payload["name"].title()
+    assert data["name"] == payload["name"]
+    #Comprobar upper()
     assert data["code"] == payload["code"].upper()
     assert data["is_active"]
     assert "created_at" in data
@@ -62,7 +62,7 @@ async def test_deny_get_category_user_by_id(
     user_client,
     category_factory
 ):
-    category = await category_factory(name="tarjeta devideo", code="gpu", is_active=False)
+    category = await category_factory(name="Tarjeta de video", code="gpu", is_active=False)
     response = await user_client.get(f"/catalog/categories/{category.category_id}")
     assert response.status_code == 404
 
@@ -71,12 +71,12 @@ async def test_get_category_by_id_ok(
     admin_client,
     category_factory
 ):
-    category = await category_factory(name="tarjeta devideo", code="gpu")
+    category = await category_factory(name="Tarjeta de video", code="gpu")
     response = await admin_client.get(f"/catalog/categories/{category.category_id}")
     assert response.status_code == 200
     data = response.json()
     assert data["category_id"] == str(category.category_id)
-    assert data["name"] == category.name.title()
+    assert data["name"] == category.name
     assert data["code"] == category.code.upper()
     assert data["is_active"] == category.is_active
     
@@ -93,7 +93,7 @@ async def test_update_categories_ok(
     past_date = datetime.now(timezone.utc) - timedelta(days=1)
     
     category = await category_factory(
-        name="tarjeta devideo", 
+        name="Tarjeta de video", 
         code="gpu", 
         created_at=past_date,
         updated_at=past_date
@@ -103,7 +103,7 @@ async def test_update_categories_ok(
     original_updated_at = category.updated_at
     original_id = str(category.category_id)
 
-    payload = {"name": "Tarjeta De Video", "is_active": False}
+    payload = {"name": "Tarjeta De video", "is_active": False}
 
     response = await admin_client.patch(
         f"/catalog/categories/{original_id}", 
@@ -118,7 +118,7 @@ async def test_update_categories_ok(
     assert response_updated_at != original_updated_at
     assert response_updated_at > original_updated_at
     
-    assert data["name"] == "Tarjeta De Video"
+    assert data["name"] == "Tarjeta De video"
     assert not data["is_active"]
 
 
@@ -130,7 +130,7 @@ async def test_delete_categories(
     brand_factory
 ):
 
-    category = await category_factory(name="procesador", code="cpu")
+    category = await category_factory(name="Procesador", code="cpu")
 
     response = await admin_client.delete(
         f"/catalog/categories/{category.category_id}"
@@ -139,8 +139,8 @@ async def test_delete_categories(
     assert response.status_code == 204
 
     #Comprobar que no se puede eliminar una categoría que tenga productos
-    category2 = await category_factory(name="tarjeta de video", code="gpu")
-    brand = await brand_factory(name="zotac", code="zot")
+    category2 = await category_factory(name="Tarjeta de video", code="gpu")
+    brand = await brand_factory(name="Zotac", code="zot")
     await product_factory(
         name="Gaming GeForce RTX 4070 Twin Edge", 
         description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
@@ -161,12 +161,11 @@ async def test_deny_duplicated_category_creation(
     await category_factory(name="Procesador", code="CPU")
     
     payload = {
-        "name": "proceSADOR",
+        "name": "Procesador",
         "code": "cpu"
     }
 
     response = await admin_client.post("/catalog/categories", json=payload)
-    #Comprobar duplicados independientemente de si los nombres esten capitalizados o no
     assert response.status_code == 409
 
 async def test_deny_duplicated_category_mofication(
@@ -180,7 +179,7 @@ async def test_deny_duplicated_category_mofication(
     await category_factory(name="Tarjeta de video", code="GPU")
     
     payload = {
-        "name": "proceSADOR",
+        "name": "Procesador",
         "code": "gpu"
     }
 

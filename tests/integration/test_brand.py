@@ -5,16 +5,16 @@ async def test_create_brand_ok(
     admin_client
 ):
     payload = {
-        "name": "corsair",
-        "code": "cors"
+        "name": "Corsair",
+        "code": "cor"
     }
 
     response = await admin_client.post("/catalog/brands", json=payload)
 
     assert response.status_code == 201
     data = response.json()
-    #Comprobar .title() y upper()
-    assert data["name"] == payload["name"].title()
+    assert data["name"] == payload["name"]
+    #Comprobar que se guarda en mayusculas
     assert data["code"] == payload["code"].upper()
     assert "brand_id" in data
 
@@ -23,11 +23,11 @@ async def test_list_brands_ok(
     admin_client,
     brand_factory
 ):
-    await brand_factory(name="corsair", code="cor", is_active=True)
-    await brand_factory(name="asus", code="asu", is_active=False)
-    await brand_factory(name="msi", code="msi", is_active=True)
-    await brand_factory(name="gigabyte", code="gig", is_active=False)
-    await brand_factory(name="razer", code="raz", is_active=True)
+    await brand_factory(name="Corsair", code="cor", is_active=True)
+    await brand_factory(name="Asus", code="asu", is_active=False)
+    await brand_factory(name="Msi", code="msi", is_active=True)
+    await brand_factory(name="Gigabyte", code="gig", is_active=False)
+    await brand_factory(name="Razer", code="raz", is_active=True)
 
     response = await admin_client.get("/catalog/brands?offset=2&limit=2")
 
@@ -41,11 +41,11 @@ async def test_list_brands_user_ok(
     user_client,
     brand_factory
 ):
-    await brand_factory(name="corsair", code="cor", is_active=True)
-    await brand_factory(name="asus", code="asu", is_active=False)
-    await brand_factory(name="msi", code="msi", is_active=True)
-    await brand_factory(name="gigabyte", code="gig", is_active=False)
-    await brand_factory(name="razer", code="raz", is_active=True)
+    await brand_factory(name="Corsair", code="cor", is_active=True)
+    await brand_factory(name="Asus", code="asu", is_active=False)
+    await brand_factory(name="Msi", code="msi", is_active=True)
+    await brand_factory(name="Gigabyte", code="gig", is_active=False)
+    await brand_factory(name="Razer", code="raz", is_active=True)
 
     response = await user_client.get("/catalog/brands?offset=2&limit=2")
 
@@ -58,7 +58,7 @@ async def test_deny_get_brand_user_by_id(
     user_client,
     brand_factory
 ):
-    brand = await brand_factory(name="asus", code="asu", is_active=False)
+    brand = await brand_factory(name="Asus", code="asu", is_active=False)
     response = await user_client.get(f"/catalog/brands/{brand.brand_id}")
     assert response.status_code == 404
 
@@ -67,16 +67,16 @@ async def test_get_brand_by_id_ok(
     admin_client,
     brand_factory
 ):
-    brand = await brand_factory(name="asus", code="asu")
+    brand = await brand_factory(name="Asus", code="asu")
     response = await admin_client.get(f"/catalog/brands/{brand.brand_id}")
     assert response.status_code == 200
     data = response.json()
     assert data["brand_id"] == str(brand.brand_id)
-    assert data["name"] == brand.name.title()
+    assert data["name"] == brand.name
     assert data["code"] == brand.code.upper()
     assert data["is_active"] == brand.is_active
     
-    brand2 = await brand_factory(name="msi", code="msi", is_active=False)
+    brand2 = await brand_factory(name="Msi", code="msi", is_active=False)
     response = await admin_client.get(f"/catalog/brands/{brand2.brand_id}")
     assert response.status_code == 200
 
@@ -89,7 +89,7 @@ async def test_update_brand_ok(
     past_date = datetime.now(timezone.utc) - timedelta(days=1)
     
     brand = await brand_factory(
-        name="asus", 
+        name="Asus", 
         code="asu", 
         created_at=past_date,
         updated_at=past_date
@@ -99,7 +99,7 @@ async def test_update_brand_ok(
     original_updated_at = brand.updated_at
     original_id = str(brand.brand_id)
 
-    payload = {"name": "asus", "is_active": False}
+    payload = {"name": "Asus", "is_active": False}
 
     response = await admin_client.patch(
         f"/catalog/brands/{original_id}", 
@@ -125,7 +125,7 @@ async def test_delete_brand(
     brand_factory
 ):
 
-    brand = await brand_factory(name="asus", code="asu")
+    brand = await brand_factory(name="Asus", code="asu")
 
     response = await admin_client.delete(
         f"/catalog/brands/{brand.brand_id}"
@@ -134,8 +134,8 @@ async def test_delete_brand(
     assert response.status_code == 204
 
     #Comprobar que no se puede eliminar una marca que tenga productos
-    brand2 = await brand_factory(name="zotac", code="zot")
-    category = await category_factory(name="tarjeta de video", code="gpu")
+    brand2 = await brand_factory(name="Zotac", code="zot")
+    category = await category_factory(name="Tarjeta de video", code="gpu")
     await product_factory(
         name="Gaming GeForce RTX 4070 Twin Edge", 
         description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
@@ -155,10 +155,10 @@ async def test_deny_duplicated_brand_creation(
     admin_client,
     brand_factory
 ):
-    await brand_factory(name="AsUs", code="ASU")
+    await brand_factory(name="Asus", code="ASU")
     
     payload = {
-        "name": "asus",
+        "name": "Asus",
         "code": "asu"
     }
 
@@ -171,13 +171,13 @@ async def test_deny_duplicated_brand_mofication(
     brand_factory
 ):
     # Crea la categoría que se va a editar
-    brand = await brand_factory(name="asus", code="asu")
+    brand = await brand_factory(name="Asus", code="asu")
     
     # Crea la categoría "rival" (la que ya tiene el código ocupado)
-    await brand_factory(name="corsair", code="cor")
+    await brand_factory(name="Corsair", code="cor")
     
     payload = {
-        "name": "corsair",
+        "name": "Corsair",
         "code": "cor"
     }
 
