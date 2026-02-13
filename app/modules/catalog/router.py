@@ -62,19 +62,23 @@ async def list_categories(
     session: SessionDep,
     user: CurrentUserOptional,
     offset: int = Query(default=0, ge=0),
-    limit: int = Query(default=10, ge=0, le=100)
+    limit: int = Query(default=10, ge=0, le=100),
+    is_active: bool | None = None
 ):
     is_admin = False
     
     if user is not None and user.role == "admin":
         is_admin = True
     
-    should_filter_active = not is_admin 
+    filter_active_state = True 
+    if is_admin:
+        filter_active_state = is_active
+
     return await serv.list_categories(
         session, 
         offset=offset, 
         limit=limit, 
-        only_active=should_filter_active
+        is_active=filter_active_state
     )
 
 @router.patch(
@@ -148,19 +152,23 @@ async def list_brands(
     session: SessionDep,
     user: CurrentUserOptional,
     offset: int = Query(default=0, ge=0),
-    limit: int = Query(default=10, ge=0, le=100)
+    limit: int = Query(default=10, ge=0, le=100),
+    is_active: bool | None = None
 ):
     is_admin = False
     
     if user is not None and user.role == "admin":
         is_admin = True
     
-    should_filter_active = not is_admin 
+    filter_active_state = True
+    if is_admin:
+        filter_active_state = is_active
+        
     return await serv.list_brands(
         session, 
         offset=offset, 
         limit=limit, 
-        only_active=should_filter_active
+        is_active=filter_active_state
     )
 @router.patch(
     "/brands/{brand_id}",
@@ -232,19 +240,29 @@ async def list_products(
     session: SessionDep,
     user: CurrentUserOptional,
     offset: int = Query(default=0, ge=0),
-    limit: int = Query(default=10, ge=0, le=100)
+    limit: int = Query(default=10, ge=0, le=100),
+    category_id: uuid.UUID | None = None,
+    brand_id: uuid.UUID | None = None,
+    search: str | None = None,
+    is_active: bool | None = None
 ):
-    is_admin = False
+    # Determinar si es admin
+    is_admin_user = user is not None and user.role == "admin"
     
-    if user is not None and user.role == "admin":
-        is_admin = True
-    
-    should_filter_active = not is_admin 
+    # Lógica de filtrado de seguridad
+    filter_active_state = True 
+
+    if is_admin_user:
+        filter_active_state = is_active
+
     return await serv.list_products(
         session, 
         offset=offset, 
         limit=limit, 
-        only_active=should_filter_active
+        is_active=filter_active_state,
+        category_id=category_id,
+        brand_id=brand_id,
+        search=search
     )
 
 @router.patch(

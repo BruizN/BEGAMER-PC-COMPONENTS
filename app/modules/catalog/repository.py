@@ -1,5 +1,5 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlmodel import select
+from sqlmodel import select, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 import uuid
@@ -58,11 +58,12 @@ async def get_all_categories(
     session: AsyncSession,
     offset: int,
     limit: int,
-    only_active: bool = True
+    is_active: bool | None = True
 ) -> list[Category]:
     query = select(Category)
-    if only_active:
-        query = query.where(Category.is_active)
+    
+    if is_active is not None:
+        query = query.where(Category.is_active == is_active)
     
     query = query.order_by(Category.created_at.desc())
     query = query.offset(offset).limit(limit)
@@ -168,11 +169,13 @@ async def get_all_brands(
     session: AsyncSession,
     offset: int,
     limit: int,
-    only_active: bool = True
+    is_active: bool | None = True
 ) -> list[Brand]:
     query = select(Brand)
-    if only_active:
-        query = query.where(Brand.is_active)
+    
+    if is_active is not None:
+        query = query.where(Brand.is_active == is_active)
+        
     query = query.order_by(Brand.created_at.desc())
     query = query.offset(offset).limit(limit)
     result = await session.exec(query)
@@ -285,7 +288,10 @@ async def get_all_products(
     session: AsyncSession,
     offset: int,
     limit: int,
-    only_active: bool = True
+    category_id: uuid.UUID | None = None,
+    brand_id: uuid.UUID | None = None,
+    search: str | None = None,
+    is_active: bool | None = None
 ) -> list[Product]:
     query = (
         select(Product)
@@ -295,8 +301,22 @@ async def get_all_products(
         )
     )
 
-    if only_active:
-        query = query.where(Product.is_active)
+    if is_active is not None:
+        query = query.where(Product.is_active == is_active)
+
+    if category_id:
+        query = query.where(Product.category_id == category_id)
+
+    if brand_id:
+        query = query.where(Product.brand_id == brand_id)
+
+    if search:
+        query = query.where(
+            or_(
+                Product.name.ilike(f"%{search}%"),
+                Product.description.ilike(f"%{search}%")
+            )
+        )
 
     query = query.order_by(Product.created_at.desc())
     query = query.offset(offset).limit(limit)

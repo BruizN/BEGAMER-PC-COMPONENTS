@@ -209,3 +209,28 @@ async def test_category_permissions_for_client(
         endpoint
     )
     assert response.status_code == 403
+
+# Comprobar filtro is_active para admins
+@pytest.mark.parametrize("is_active, expected_count", [
+    (True, 2),   # Solo activas
+    (False, 1),  # Solo inactivas
+    (None, 3)    # Todas
+])
+async def test_list_categories_admin_filter_active(
+    admin_client,
+    category_factory,
+    is_active,
+    expected_count
+):
+    await category_factory(name="Activa 1", code="A1", is_active=True)
+    await category_factory(name="Activa 2", code="A2", is_active=True)
+    await category_factory(name="Inactiva 1", code="I1", is_active=False)
+
+    params = {}
+    if is_active is not None:
+        params["is_active"] = is_active
+        
+    response = await admin_client.get("/catalog/categories", params=params)
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == expected_count

@@ -80,6 +80,60 @@ async def test_list_products_ok(
     assert len(data) == 2
 
 
+# Listado filtrado por marca, categoría y búsqueda
+@pytest.mark.parametrize("query_param, lookup_key, expected_count", [
+    ("brand_id", "ref_brand_zotac", 1),    # Filtrar por Marca Zotac
+    ("category_id", "ref_cat_gpu", 2),     # Filtrar por Categoria GPU
+    ("brand_id", "ref_brand_intel", 1),    # Filtrar por Marca Intel
+    ("search", "ref_search_psu", 1),       # Búsqueda por texto (Descripción)
+    ("search", "ref_search_asus", 1),      # Búsqueda por texto (Nombre)
+])
+async def test_list_products_filter_ok(
+    user_client,
+    brand_factory,
+    category_factory,
+    product_factory,
+    query_param,
+    lookup_key,
+    expected_count
+):
+    # --- ARRANGE: Creación de datos ---
+    cat_gpu = await category_factory(name="tarjeta de video", code="gpu")
+    cat_cpu = await category_factory(name="Procesador", code="cpu")
+    cat_psu = await category_factory(name="fuente de poder", code="psu")
+
+    brand_zotac = await brand_factory(name="zotac", code="zot")
+    brand_asus = await brand_factory(name="asus", code="asu")
+    brand_intel = await brand_factory(name="intel", code="int")
+    brand_helios = await brand_factory(name="helios", code="hel")
+
+    # Productos
+    await product_factory(name="Zotac 4070", category=cat_gpu, brand=brand_zotac)
+    await product_factory(name="Asus 4070", category=cat_gpu, brand=brand_asus)
+    await product_factory(name="i9-14900K", category=cat_cpu, brand=brand_intel)
+    await product_factory(name="Helios 1000W", category=cat_psu, brand=brand_helios, 
+                          description="Fuente certificada 80 Plus Gold")
+
+    # Aquí convertimos las claves del parametrize en los valores reales (UUIDs o Strings)
+    values_map = {
+        "ref_brand_zotac": str(brand_zotac.brand_id),
+        "ref_brand_intel": str(brand_intel.brand_id),
+        "ref_cat_gpu": str(cat_gpu.category_id),
+        "ref_search_psu": "80 Plus",
+        "ref_search_asus": "Asus"
+    }
+
+    # Obtenemos el valor real.
+    filter_value = values_map[lookup_key]
+
+    params = {query_param: filter_value}
+    response = await user_client.get("/catalog/products", params=params)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == expected_count
+
+
 #Comprobar paginación y que siendo usuario común solo se vean los productos activos
 async def test_list_products_user_ok(
     user_client,

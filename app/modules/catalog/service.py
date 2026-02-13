@@ -31,9 +31,9 @@ async def list_categories(
     session: AsyncSession,
     offset: int,
     limit: int,
-    only_active: bool
+    is_active: bool | None = True
 ) -> list[Category]:
-    return await repo.get_all_categories(session, offset, limit, only_active)
+    return await repo.get_all_categories(session, offset, limit, is_active)
 
 async def edit_category(
     session: AsyncSession,
@@ -69,9 +69,9 @@ async def list_brands(
     session: AsyncSession,
     offset: int,
     limit: int,
-    only_active: bool
+    is_active: bool | None = True
 ) -> list[Brand]:
-    return await repo.get_all_brands(session, offset, limit, only_active)
+    return await repo.get_all_brands(session, offset, limit, is_active)
 
 async def edit_brand(
     session: AsyncSession,
@@ -125,9 +125,12 @@ async def list_products(
     session: AsyncSession,
     offset: int,
     limit: int,
-    only_active: bool
+    category_id: uuid.UUID | None = None,
+    brand_id: uuid.UUID | None = None,
+    search: str | None = None,
+    is_active: bool | None = None
 ) -> list[Product]:
-    return await repo.get_all_products(session, offset, limit, only_active)
+    return await repo.get_all_products(session, offset, limit, category_id, brand_id, search, is_active)
 
 async def edit_product(
     session: AsyncSession,
