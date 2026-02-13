@@ -47,33 +47,57 @@
             <li><a href="../../context/" class="">Context views</a></li>
             <li><a href="../../container/" class="">Container views</a></li>
             <li><a href="../../dependencies/" class="">Dependencies</a></li>
-            <li class="is-active"><a href="../" class="is-active">Decisions</a></li>
-            <li><a href="../../sections/" class="">Documentation</a></li>
+            <li><a href="../../decisions/" class="">Decisions</a></li>
+            <li class="is-active"><a href="../" class="is-active">Documentation</a></li>
           </ul>
         </div>
         <div class="content p-3">
-          <div><h1>4. Estrategia de Autenticación y Seguridad</h1>
-<p><strong>Fecha:</strong> 2025-12-23 <strong>Estado:</strong> Aceptado</p>
-<h2>Contexto</h2>
-<p>El sistema requiere identificar a los administradores y clientes de forma segura. Se necesita un mecanismo para mantener la sesión del usuario entre peticiones de forma eficiente (stateless vs stateful) y una forma robusta de almacenar credenciales, ya que almacenar contraseñas en texto plano es inaceptable.</p>
-<h2>Decisiones</h2>
-<h3>1. Mecanismo de Sesión: JWT (JSON Web Tokens)</h3>
-<p>Se utilizará el esquema de autenticación <strong>Bearer Token</strong> con <strong>JWT</strong>.</p>
-<ul>
- <li><strong>Justificación:</strong> Permite que la API sea completamente <em>stateless</em> (sin guardar sesiones en memoria o BD), lo que facilita el escalado horizontal.</li>
- <li><strong>Implementación:</strong> FastAPI gestionará la seguridad de los endpoints mediante <code>HTTPBearer</code>, validando la firma del token en cada petición protegida.</li>
-</ul>
-<h3>2. Almacenamiento de Contraseñas: Hashing con Argon2</h3>
-<p>Se utilizará el algoritmo <strong>Argon2</strong> (vía librería <code>pwdlib</code>).</p>
-<ul>
- <li><strong>Justificación:</strong> Argon2 es el ganador de la <em>Password Hashing Competition</em>. Es resistente a ataques de fuerza bruta por GPU/ASIC, siendo superior a estándares antiguos como SHA256 o MD5.</li>
-</ul>
-<h3>3. Librería de Criptografía: PyJWT</h3>
-<p>Se utilizará <strong>PyJWT</strong> para la generación (codificación) y validación (decodificación) de los tokens.</p>
-<h2>Consecuencias</h2>
-<ul>
- <li><strong>Responsabilidad del Cliente:</strong> El frontend (o cliente API) debe encargarse de almacenar el token de forma segura y enviarlo en el header <code>Authorization</code> en cada petición.</li>
-</ul></div>
+          <div><h1>Modelo de Datos (Iteración actual)</h1>
+<p><strong>Nota de Diseño:</strong> Se utiliza UUIDv7 para la Clave Primaria. Esto permite mantener la base de datos indexada eficientemente por tiempo, evitando la fragmentación que producen los UUIDv4 aleatorios.</p>
+<pre><code class="language-mermaid">erDiagram
+    user {
+        UUID user_id PK "UUIDv7"
+        VARCHAR email UK "Unique"
+        VARCHAR hashed_password
+        VARCHAR role
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    category {
+        UUID category_id PK "UUIDv7"
+        VARCHAR name UK
+        VARCHAR code UK "Ej: GPU"
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    brand {
+        UUID brand_id PK "UUIDv7"
+        VARCHAR name UK
+        VARCHAR code UK "Ej: ASU"
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    product {
+        UUID product_id PK "UUIDv7"
+        VARCHAR name UK "Unique, Index"
+        VARCHAR model_slug UK "Unique, Index"
+        TEXT description
+        UUID category_id FK
+        UUID brand_id FK
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    %% Relaciones
+    category ||--|{ product : "clasifica a"
+    brand    ||--|{ product : "fabrica a"</code></pre></div>
         </div>
       </div>
     </div>
