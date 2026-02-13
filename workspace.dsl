@@ -7,7 +7,7 @@ workspace {
 
         # --- Tu Sistema ---
         ecommerce = softwareSystem "BEGamer Components" "Plataforma para buscar, comparar y comprar hardware." {
-            # Le dice a Structurizr que busque la documentación dentro de estas carpetas
+            # Le dice a Structurizr que busque la documentación dentro de estas carpetas 
             !docs docs
             !adrs adrs
             api = container "API Backend" "Maneja la autenticación, autorización, y la lógica de negocio del catálogo." "Python 3.13 slim + FastAPI" {

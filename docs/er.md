@@ -34,7 +34,7 @@ erDiagram
 
     product {
         UUID product_id PK "UUIDv7"
-        VARCHAR name UK "Unique"
+        VARCHAR name UK "Unique, Index"
         VARCHAR model_slug UK "Unique, Index"
         TEXT description
         UUID category_id FK
