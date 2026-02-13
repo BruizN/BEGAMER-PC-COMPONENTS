@@ -83,6 +83,18 @@ Para simular un entorno real, el desarrollo sigue estas reglas:
     1.  Pasar el Pipeline de CI (Tests + Linter `Ruff`).
     2.  Cumplir con la plantilla de descripción de cambios.
 
+## 🤖 Desarrollo Aumentado por IA (AI-Assisted Engineering)
+
+Este proyecto abraza el uso de Inteligencia Artificial Generativa como una herramienta de productividad y aprendizaje acelerado, no como un sustituto del ingeniero.
+
+Mi enfoque de trabajo con IA se rige por los siguientes principios:
+
+* **Copilot, no Autopilot:** Utilizo LLMs para generar *boilerplate*, sugerir casos de test y explorar patrones de diseño, pero **la arquitectura y la lógica de negocio son diseño propio**.
+* **Criterio Ingenieril:** La IA a menudo puede sugiere soluciones obsoletas o inseguras. Mi rol es auditar, corregir y optimizar cada línea de código sugerida antes de integrarla.
+* **Herramienta de Aprendizaje:** Uso la IA para profundizar en conceptos avanzados (como la implementación interna de UUIDv7 o estrategias de índices en Postgres) y entender el "por qué" detrás de cada implementación.
+
+> *"La IA propone, el ingeniero dispone."*
+
 ---
 
 ## ⚡ Instalación y Ejecución
@@ -157,6 +169,7 @@ Para ejecutar la suite de pruebas (Integration Tests), usa el servicio de prueba
 
 ```bash
 docker-compose run --rm backend pytest
+```
 
 👤 Autor
 * **Bruno Ruiz**
