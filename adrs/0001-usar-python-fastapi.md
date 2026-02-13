@@ -4,16 +4,13 @@
 **Estado:** Aceptado
 
 ## Contexto
-El proyecto "BEGamer Components" requiere el desarrollo de una API REST eficiente y documentada para gestionar el inventario y las ventas. El equipo de desarrollo (unipersonal) cuenta con un tiempo limitado para la implementación y requiere herramientas que permitan un desarrollo ágil.
+El proyecto "BEGamer Components" requiere el desarrollo de una API REST eficiente y documentada para gestionar el inventario y las ventas.
 
 Limitaciones:
-* El desarrollador tiene experiencia previa y dominio de Python.
 * Se requiere validación de datos robusta para evitar errores en las órdenes de compra.
 
 ## Decisión
 Se utilizará el lenguaje **Python** v3.13 junto con el framework **FastAPI**.
-
-Se descartan otros lenguajes (como Java o C#) debido a la curva de aprendizaje que implicarían, lo cual pondría en riesgo los plazos de entrega del proyecto.
 
 ## Consecuencias
 
