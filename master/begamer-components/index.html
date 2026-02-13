@@ -31,7 +31,7 @@
       <aside class="menu p-3">
         <p class="menu-label">General</p>
         <ul class="menu-list has-site-branding">
-          <li><a href="../" class="">Home</a><a href="../software-systems/" class="">Software Systems</a></li>
+          <li><a href="../" class="">Home</a><a href="../decisions/" class="">Decisions</a><a href="../software-systems/" class="">Software Systems</a><a href="../modelo-de-datos-(iteración-actual)/" class="">Modelo de Datos (Iteración actual)</a></li>
         </ul>
         <p class="menu-label">Software systems</p>
         <ul class="menu-list has-site-branding">
@@ -47,44 +47,11 @@
             <li><a href="context/" class="">Context views</a></li>
             <li><a href="container/" class="">Container views</a></li>
             <li><a href="dependencies/" class="">Dependencies</a></li>
-            <li><a href="decisions/" class="">Decisions</a></li>
-            <li><a href="sections/" class="">Documentation</a></li>
           </ul>
         </div>
         <div class="content p-3">
-          <div><h1>BeGamer Components - Documentación de Arquitectura</h1>
-<h2>🎯 Introducción</h2>
-<p><strong>BeGamer Components</strong> es una plataforma de comercio electrónico especializada en la venta de hardware para PC. Este sistema gestiona el catálogo de productos (componentes), inventario, marcas y categorías, exponiendo una API RESTful para el consumo de clientes frontend y administradores.</p>
-<p>Esta documentación describe la arquitectura de software del sistema utilizando los dos primeros niveles del modelo <strong>C4 (Context y Containers)</strong> y registra las Decisiones de Arquitectura (ADRs) clave que guían el desarrollo.</p>
-<blockquote>
- <p><strong>Nota de Estado:</strong> Este proyecto se encuentra en desarrollo activo. Algunas integraciones descritas en el nivel de contexto (como Pasarela de Pagos o SII) representan el <strong>diseño arquitectónico objetivo</strong> y se encuentran en fase de planificación o simulación, no necesariamente implementadas en el código productivo actual.</p>
-</blockquote>
-<h2>🏗️ Estructura de la Documentación</h2>
-<p>En este sitio encontrarás:</p>
-<ol>
- <li><strong>Modelo C4 (Arquitectura):</strong>
-  <ul>
-   <li><strong>Nivel 1 - Contexto del Sistema:</strong> Visión general de los actores (Cliente, Admin) y cómo el sistema <strong>interactuará</strong> con servicios externos (Webpay, SII, Correo) en su versión final.</li>
-   <li><strong>Nivel 2 - Contenedores:</strong> Desglose detallado de la arquitectura actual del Backend (API FastAPI), la Base de Datos y sus responsabilidades.</li>
-  </ul></li>
- <li><strong>Modelo de Datos:</strong> Diagramas Entidad-Relación (ER) de las tablas implementadas.</li>
- <li><strong>Decisiones de Arquitectura (ADRs):</strong> Registro histórico del "por qué" de las decisiones técnicas (FastAPI, UUIDv7, PostgreSQL, etc.).</li>
-</ol>
-<h2>🚀 Tecnologías Clave</h2>
-<p>El sistema está construido sobre un stack moderno enfocado en rendimiento y seguridad:</p>
-<ul>
- <li><strong>Lenguaje:</strong> Python 3.13</li>
- <li><strong>Framework Web:</strong> FastAPI (Asíncrono)</li>
- <li><strong>Base de Datos:</strong> PostgreSQL 15</li>
- <li><strong>Seguridad:</strong> OAuth2 con JWT y Hashing Argon2</li>
- <li><strong>Infraestructura:</strong> Docker &amp; Docker Compose</li>
-</ul>
-<h2>👤 Autoría</h2>
-<p>Este proyecto es una iniciativa de desarrollo personal para aplicar estándares de ingeniería de software en un entorno simulado.</p>
-<ul>
- <li><strong>Autor:</strong> Bruno Ruiz</li>
- <li><strong>Repositorio:</strong> <a href="https://github.com/bruizn/begamer-pc-components" target="blank">GitHub</a></li>
-</ul></div>
+          <div><h1>Description</h1>
+<p>Plataforma para buscar, comparar y comprar hardware.</p></div>
         </div>
       </div>
     </div>
