@@ -1,5 +1,6 @@
 workspace {
-
+    !docs docs
+    !adrs adrs
     model {
         # --- Actores ---
         cliente = person "Cliente" "Persona interesada en armar o mejorar su PC."
@@ -7,9 +8,6 @@ workspace {
 
         # --- Tu Sistema ---
         ecommerce = softwareSystem "BEGamer Components" "Plataforma para buscar, comparar y comprar hardware." {
-            # Le dice a Structurizr que busque la documentación dentro de estas carpetas 
-            !docs docs
-            !adrs adrs
             api = container "API Backend" "Maneja la autenticación, autorización, y la lógica de negocio del catálogo." "Python 3.13 slim + FastAPI" {
                 tags "API"
             }
