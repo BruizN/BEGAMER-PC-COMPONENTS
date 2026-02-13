@@ -125,9 +125,12 @@ async def list_products(
     session: AsyncSession,
     offset: int,
     limit: int,
-    only_active: bool
+    only_active: bool,
+    category_id: uuid.UUID | None = None,
+    brand_id: uuid.UUID | None = None,
+    search: str | None = None
 ) -> list[Product]:
-    return await repo.get_all_products(session, offset, limit, only_active)
+    return await repo.get_all_products(session, offset, limit, only_active, category_id, brand_id, search)
 
 async def edit_product(
     session: AsyncSession,

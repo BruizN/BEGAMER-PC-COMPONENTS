@@ -232,7 +232,10 @@ async def list_products(
     session: SessionDep,
     user: CurrentUserOptional,
     offset: int = Query(default=0, ge=0),
-    limit: int = Query(default=10, ge=0, le=100)
+    limit: int = Query(default=10, ge=0, le=100),
+    category_id: uuid.UUID | None = None,
+    brand_id: uuid.UUID | None = None,
+    search: str | None = None
 ):
     is_admin = False
     
@@ -244,7 +247,10 @@ async def list_products(
         session, 
         offset=offset, 
         limit=limit, 
-        only_active=should_filter_active
+        only_active=should_filter_active,
+        category_id=category_id,
+        brand_id=brand_id,
+        search=search
     )
 
 @router.patch(
