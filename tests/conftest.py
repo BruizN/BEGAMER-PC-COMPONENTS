@@ -205,10 +205,10 @@ async def brand_factory(db_session):
 async def product_factory(db_session):
     async def _create_product(
         name: str, 
-        description: str, 
         category: Category, 
         brand: Brand, 
         is_active: bool = True, 
+        description: str | None = None, 
         created_at: datetime | None = None, 
         updated_at: datetime | None = None
         ):
