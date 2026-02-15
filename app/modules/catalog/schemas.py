@@ -2,6 +2,7 @@ from sqlmodel import SQLModel, Field
 from app.core.types import CleanText, CleanCode
 from datetime import datetime
 import uuid
+from decimal import Decimal
 
 class CategoryBase(SQLModel):
     name: CleanText = Field(min_length=3, max_length=50)
@@ -64,4 +65,27 @@ class ProductUpdate(SQLModel):
     description: CleanText | None = None
     category_id: uuid.UUID | None = None
     brand_id: uuid.UUID | None = None
+    is_active: bool | None = None
+
+
+class ProductVariantBase(SQLModel):
+    price: Decimal = Field(gt=0, max_digits=10, decimal_places=2)
+    stock: int = Field(ge=0)
+    attributes: CleanText
+
+class ProductVariantCreate(ProductVariantBase):
+    pass
+
+class ProductVariantRead(ProductVariantBase):
+    variant_id: uuid.UUID
+    sku: str
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
+    product: ProductRead
+
+class ProductVariantUpdate(SQLModel):
+    price: Decimal | None = Field(default=None, gt=0, max_digits=10, decimal_places=2)
+    stock: int | None = Field(default=None, ge=0)
+    attributes: CleanText | None = None
     is_active: bool | None = None
