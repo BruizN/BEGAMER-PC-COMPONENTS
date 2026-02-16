@@ -9,7 +9,7 @@ async def test_create_brand_ok(
         "code": "cor"
     }
 
-    response = await admin_client.post("/catalog/brands", json=payload)
+    response = await admin_client.post("/catalog/brands/", json=payload)
 
     assert response.status_code == 201
     data = response.json()
@@ -29,7 +29,7 @@ async def test_list_brands_ok(
     await brand_factory(name="Gigabyte", code="gig", is_active=False)
     await brand_factory(name="Razer", code="raz", is_active=True)
 
-    response = await admin_client.get("/catalog/brands?offset=2&limit=2")
+    response = await admin_client.get("/catalog/brands/?offset=2&limit=2")
 
     assert response.status_code == 200
     data = response.json()
@@ -47,7 +47,7 @@ async def test_list_brands_user_ok(
     await brand_factory(name="Gigabyte", code="gig", is_active=False)
     await brand_factory(name="Razer", code="raz", is_active=True)
 
-    response = await user_client.get("/catalog/brands?offset=2&limit=2")
+    response = await user_client.get("/catalog/brands/?offset=2&limit=2")
 
     assert response.status_code == 200
     data = response.json()
@@ -162,7 +162,7 @@ async def test_deny_duplicated_brand_creation(
         "code": "asu"
     }
 
-    response = await admin_client.post("/catalog/brands", json=payload)
+    response = await admin_client.post("/catalog/brands/", json=payload)
     #Comprobar duplicados independientemente de si los nombres esten capitalizados o no
     assert response.status_code == 409
 
@@ -191,7 +191,7 @@ async def test_deny_duplicated_brand_mofication(
 
 #Comprobar denegación inmediata a usuarios clientes
 @pytest.mark.parametrize("endpoint, method", [
-    ("/catalog/brands", "post"),
+    ("/catalog/brands/", "post"),
     ("/catalog/brands/999", "patch"),
     ("/catalog/brands/999", "delete"),
 ])
@@ -228,7 +228,7 @@ async def test_list_brands_admin_filter_active(
     if is_active is not None:
         params["is_active"] = is_active
         
-    response = await admin_client.get("/catalog/brands", params=params)
+    response = await admin_client.get("/catalog/brands/", params=params)
     assert response.status_code == 200
     data = response.json()
     assert len(data) == expected_count
