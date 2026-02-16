@@ -33,3 +33,7 @@ class ProductNotFoundError(CatalogError):
 class ProductAlreadyExistsError(CatalogError):
     """Se lanza cuando se intenta crear un producto duplicado"""
     pass
+
+class SkuAlreadyExistsError(CatalogError):
+    """Se lanza cuando se intenta crear una variante con un SKU duplicado"""
+    pass
