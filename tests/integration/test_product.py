@@ -29,7 +29,7 @@ async def test_create_product_ok(
     generated_slug = slugify(slug_text)
     payload["slug"] = generated_slug
 
-    response = await admin_client.post("/catalog/products", json=payload)
+    response = await admin_client.post("/catalog/products/", json=payload)
 
     assert response.status_code == 201
     data = response.json()
@@ -73,7 +73,7 @@ async def test_list_products_ok(
         brand=brand3
         )
 
-    response = await admin_client.get("/catalog/products?offset=0&limit=2")
+    response = await admin_client.get("/catalog/products/?offset=0&limit=2")
 
     assert response.status_code == 200
     data = response.json()
@@ -127,7 +127,7 @@ async def test_list_products_filter_ok(
     filter_value = values_map[lookup_key]
 
     params = {query_param: filter_value}
-    response = await user_client.get("/catalog/products", params=params)
+    response = await user_client.get("/catalog/products/", params=params)
 
     assert response.status_code == 200
     data = response.json()
@@ -170,7 +170,7 @@ async def test_list_products_user_ok(
         brand=brand3
         )
 
-    response = await user_client.get("/catalog/products?offset=0&limit=2")
+    response = await user_client.get("/catalog/products/?offset=0&limit=2")
 
     assert response.status_code == 200
     data = response.json()
@@ -328,7 +328,7 @@ async def test_deny_duplicated_product_creation(
         "brand_id": str(brand.brand_id)
     }
 
-    response = await admin_client.post("/catalog/products", json=payload)
+    response = await admin_client.post("/catalog/products/", json=payload)
     #Comprobar duplicados, en este caso ambos names son distintos(mayusculas y minusculas), pero el slug es el mismo
     assert response.status_code == 409
 
@@ -369,7 +369,7 @@ async def test_deny_duplicated_product_mofication(
 
 #Comprobar denegación inmediata a usuarios clientes
 @pytest.mark.parametrize("endpoint, method", [
-    ("/catalog/products", "post"),
+    ("/catalog/products/", "post"),
     ("/catalog/products/999", "patch"),
     ("/catalog/products/999", "delete"),
 ])

@@ -1,4 +1,6 @@
-from app.modules.catalog import repository as repo
+from app.modules.catalog.repository import category_repo as cat_repo
+from app.modules.catalog.repository import brand_repo as brand_repo
+from app.modules.catalog.repository import product_repo as prod_repo
 from app.modules.catalog.models import Category, Brand, Product
 from app.modules.catalog.schemas import (
     CategoryCreate, 
@@ -18,14 +20,14 @@ async def create_category(
 ) -> Category:
     new_category = Category.model_validate(category_data)
     
-    return await repo.add_category(session, new_category)
+    return await cat_repo.add_category(session, new_category)
 
 async def get_category(
     session: AsyncSession,
     category_id: uuid.UUID,
     only_active: bool
 ) -> Category:
-    return await repo.get_category(session, category_id, only_active)
+    return await cat_repo.get_category(session, category_id, only_active)
     
 async def list_categories(
     session: AsyncSession,
@@ -33,7 +35,7 @@ async def list_categories(
     limit: int,
     is_active: bool | None = True
 ) -> list[Category]:
-    return await repo.get_all_categories(session, offset, limit, is_active)
+    return await cat_repo.get_all_categories(session, offset, limit, is_active)
 
 async def edit_category(
     session: AsyncSession,
@@ -41,13 +43,13 @@ async def edit_category(
     edit_category_data: CategoryUpdate 
 ) -> Category:
     update_data = edit_category_data.model_dump(exclude_unset=True)
-    return await repo.update_category(session, category_id, update_data)
+    return await cat_repo.update_category(session, category_id, update_data)
 
 async def delete_category(
     session: AsyncSession, 
     category_id: uuid.UUID
 ) -> None:
-    await repo.remove_category(session, category_id)
+    await cat_repo.remove_category(session, category_id)
     return
 
 async def create_brand(
@@ -56,14 +58,14 @@ async def create_brand(
 ) -> Brand:
     new_brand = Brand.model_validate(brand_data)
 
-    return await repo.add_brand(session, new_brand)
+    return await brand_repo.add_brand(session, new_brand)
 
 async def get_brand(
     session: AsyncSession,
     brand_id: uuid.UUID,
     only_active: bool
 ) -> Brand:
-    return await repo.get_brand(session, brand_id, only_active)
+    return await brand_repo.get_brand(session, brand_id, only_active)
 
 async def list_brands(
     session: AsyncSession,
@@ -71,7 +73,7 @@ async def list_brands(
     limit: int,
     is_active: bool | None = True
 ) -> list[Brand]:
-    return await repo.get_all_brands(session, offset, limit, is_active)
+    return await brand_repo.get_all_brands(session, offset, limit, is_active)
 
 async def edit_brand(
     session: AsyncSession,
@@ -79,21 +81,21 @@ async def edit_brand(
     edit_brand_data: BrandUpdate
 ) -> Brand:
     update_data = edit_brand_data.model_dump(exclude_unset=True)
-    return await repo.update_brand(session, brand_id, update_data)
+    return await brand_repo.update_brand(session, brand_id, update_data)
 
 async def delete_brand(
     session: AsyncSession,
     brand_id: uuid.UUID
 ) -> None:
-    await repo.remove_brand(session, brand_id)
+    await brand_repo.remove_brand(session, brand_id)
     return 
 
 async def create_product(
     session: AsyncSession,
     product_data: ProductCreate
 ) -> Product:
-    brand = await repo.get_brand(session, product_data.brand_id, True)
-    category = await repo.get_category(session, product_data.category_id, True)
+    brand = await get_brand(session, product_data.brand_id, True)
+    category = await get_category(session, product_data.category_id, True)
 
     nombre_producto = product_data.name
     nombre_marca = brand.name
@@ -112,14 +114,14 @@ async def create_product(
             "slug": generated_slug
         }
     )
-    return await repo.add_product(session, new_product)
+    return await prod_repo.add_product(session, new_product)
 
 async def get_product(
     session: AsyncSession,
     product_id: uuid.UUID,
     only_active: bool
 ) -> Product:
-    return await repo.get_product(session, product_id, only_active)
+    return await prod_repo.get_product(session, product_id, only_active)
 
 async def list_products(
     session: AsyncSession,
@@ -130,7 +132,7 @@ async def list_products(
     search: str | None = None,
     is_active: bool | None = None
 ) -> list[Product]:
-    return await repo.get_all_products(session, offset, limit, category_id, brand_id, search, is_active)
+    return await prod_repo.get_all_products(session, offset, limit, category_id, brand_id, search, is_active)
 
 async def edit_product(
     session: AsyncSession,
@@ -139,7 +141,7 @@ async def edit_product(
 ) -> Product:
 
     # Obtener el producto actual
-    current_product = await repo.get_product(session, product_id, False)
+    current_product = await prod_repo.get_product(session, product_id, False)
 
     update_data = edit_product_data.model_dump(exclude_unset=True)
 
@@ -157,8 +159,8 @@ async def edit_product(
         effective_brand_id = update_data.get("brand_id", current_product.brand_id)
         effective_category_id = update_data.get("category_id", current_product.category_id)
 
-        brand = await repo.get_brand(session, effective_brand_id, False)
-        category = await repo.get_category(session, effective_category_id, False)
+        brand = await get_brand(session, effective_brand_id, False)
+        category = await get_category(session, effective_category_id, False)
         
         brand_name_lower = brand.name.lower()
         product_name_lower = effective_name.lower()
@@ -172,12 +174,12 @@ async def edit_product(
         
         update_data["slug"] = new_slug
 
-    return await repo.update_product(session, product_id, update_data)
+    return await prod_repo.update_product(session, product_id, update_data)
 
 
 async def delete_product(
     session: AsyncSession,
     product_id: uuid.UUID
 ) -> None:
-    await repo.remove_product(session, product_id)
+    await prod_repo.remove_product(session, product_id)
     return

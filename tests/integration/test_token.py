@@ -20,7 +20,7 @@ async def test_protected_route_rejects_expired_token(client):
     )
 
     response = await client.post(
-        "/catalog/categories",
+        "/catalog/categories/",
         headers={"Authorization": f"bearer {expired_token}"}
     )
 #   Validar que la API lo rechace
@@ -48,7 +48,7 @@ async def test_protected_route_rejects_tampered_token(client):
     )
 
     response = await client.post(
-        "/catalog/categories",
+        "/catalog/categories/",
         headers={"Authorization": f"bearer {tampered_token}"}
     )
 

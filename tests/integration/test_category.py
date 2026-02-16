@@ -9,7 +9,7 @@ async def test_create_category_ok(
         "code": "gpu"
     }
 
-    response = await admin_client.post("/catalog/categories", json=payload)
+    response = await admin_client.post("/catalog/categories/", json=payload)
 
     assert response.status_code == 201
     data = response.json()
@@ -33,7 +33,7 @@ async def test_list_categories_admin_ok(
     await category_factory(name="Memoria RAM", code="ram", is_active=True)
     await category_factory(name="Almacenamiento", code="sto", is_active=False)
 
-    response = await admin_client.get("/catalog/categories?offset=2&limit=4")
+    response = await admin_client.get("/catalog/categories/?offset=2&limit=4")
 
     assert response.status_code == 200
     data = response.json()
@@ -51,7 +51,7 @@ async def test_list_categories_user_ok(
     await category_factory(name="Memoria RAM", code="ram", is_active=True)
     await category_factory(name="Almacenamiento", code="sto", is_active=False)
 
-    response = await user_client.get("/catalog/categories?offset=2&limit=4")
+    response = await user_client.get("/catalog/categories/?offset=2&limit=4")
 
     assert response.status_code == 200
     data = response.json()
@@ -165,7 +165,7 @@ async def test_deny_duplicated_category_creation(
         "code": "cpu"
     }
 
-    response = await admin_client.post("/catalog/categories", json=payload)
+    response = await admin_client.post("/catalog/categories/", json=payload)
     assert response.status_code == 409
 
 async def test_deny_duplicated_category_mofication(
@@ -193,7 +193,7 @@ async def test_deny_duplicated_category_mofication(
 
 #Comprobar denegación inmediata a usuarios clientes
 @pytest.mark.parametrize("endpoint, method", [
-    ("/catalog/categories", "post"),
+    ("/catalog/categories/", "post"),
     ("/catalog/categories/999", "patch"),
     ("/catalog/categories/999", "delete"),
 ])
@@ -230,7 +230,7 @@ async def test_list_categories_admin_filter_active(
     if is_active is not None:
         params["is_active"] = is_active
         
-    response = await admin_client.get("/catalog/categories", params=params)
+    response = await admin_client.get("/catalog/categories/", params=params)
     assert response.status_code == 200
     data = response.json()
     assert len(data) == expected_count
