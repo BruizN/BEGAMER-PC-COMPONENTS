@@ -1,18 +1,37 @@
 from app.modules.catalog.repository import category_repo as cat_repo
 from app.modules.catalog.repository import brand_repo as brand_repo
 from app.modules.catalog.repository import product_repo as prod_repo
-from app.modules.catalog.models import Category, Brand, Product
+from app.modules.catalog.repository import variant_repo as var_repo
+from app.modules.catalog.models import Category, Brand, Product, ProductVariant
 from app.modules.catalog.schemas import (
     CategoryCreate, 
     CategoryUpdate,
     BrandCreate,
     BrandUpdate,
     ProductCreate,
-    ProductUpdate
+    ProductUpdate,
+    ProductVariantCreate,
+    ProductVariantUpdate
 )
 from sqlmodel.ext.asyncio.session import AsyncSession
 from slugify import slugify
 import uuid
+
+def _generate_sku(
+    category_code: str,
+    brand_code: str,
+    product_name: str,
+    attributes: str
+) -> str:
+    """
+    Genera un SKU limpio y estandarizado.
+    Ejemplo: GPU - ASU - RTX-4060 - WHITE-8GB
+    """
+
+    clean_product = slugify(product_name).upper()
+    clean_attributes = slugify(attributes).upper()
+
+    return f"{category_code}-{brand_code}-{clean_product}-{clean_attributes}"
 
 async def create_category(
     session: AsyncSession,
@@ -183,3 +202,29 @@ async def delete_product(
 ) -> None:
     await prod_repo.remove_product(session, product_id)
     return
+
+
+async def create_variant(
+    session: AsyncSession,
+    product_id: uuid.UUID,
+    variant_data: ProductVariantCreate
+) -> ProductVariant:
+    product = await prod_repo.get_product(session, product_id, True)
+
+    generated_sku = _generate_sku(
+        category_code=product.category.code,
+        brand_code=product.brand.code,
+        product_name=product.name,
+        attributes=variant_data.attributes
+    )
+
+    new_variant = ProductVariant.model_validate(
+        variant_data,
+        update={
+            "sku": generated_sku,
+            "product_id": product_id
+        }
+    )
+
+    return await var_repo.add_variant(session, new_variant)
+    
