@@ -8,7 +8,8 @@ from app.modules.catalog.handlers import (
     brand_not_empty_handler,
     product_exists_handler,
     product_not_found_handler,
-    sku_exists_handler
+    sku_exists_handler,
+    variant_not_found_handler
 )
 from app.modules.catalog.exceptions import (
     CategoryNotFoundError, 
@@ -19,7 +20,8 @@ from app.modules.catalog.exceptions import (
     BrandNotEmptyError,
     ProductNotFoundError,
     ProductAlreadyExistsError,
-    SkuAlreadyExistsError
+    SkuAlreadyExistsError,
+    VariantNotFoundError
 )
 from app.modules.auth.router import router as auth_router
 from app.modules.catalog.routers import catalog_router
@@ -39,6 +41,7 @@ app.add_exception_handler(BrandNotEmptyError, brand_not_empty_handler)
 app.add_exception_handler(ProductNotFoundError, product_not_found_handler)
 app.add_exception_handler(ProductAlreadyExistsError, product_exists_handler)
 app.add_exception_handler(SkuAlreadyExistsError, sku_exists_handler)
+app.add_exception_handler(VariantNotFoundError, variant_not_found_handler)
 
 @app.get("/health")
 async def health():
