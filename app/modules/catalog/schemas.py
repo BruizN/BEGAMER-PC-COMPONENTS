@@ -76,16 +76,34 @@ class ProductVariantBase(SQLModel):
 class ProductVariantCreate(ProductVariantBase):
     pass
 
-class ProductVariantRead(ProductVariantBase):
-    variant_id: uuid.UUID
-    sku: str
-    is_active: bool
-    created_at: datetime
-    updated_at: datetime
-    product: ProductRead
 
 class ProductVariantUpdate(SQLModel):
     price: Decimal | None = Field(default=None, gt=0, max_digits=10, decimal_places=2)
     stock: int | None = Field(default=None, ge=0)
     attributes: CleanText | None = None
     is_active: bool | None = None
+
+
+# --- Esquemas de lectura ligera para variantes ---
+class BrandBasic(SQLModel):
+    name: str
+    code: str
+
+class CategoryBasic(SQLModel):
+    name: str
+    code: str
+
+class ProductBasic(SQLModel):
+    product_id: uuid.UUID
+    name: str
+    slug: str
+    category: CategoryBasic 
+    brand: BrandBasic
+
+class ProductVariantRead(ProductVariantBase):
+    variant_id: uuid.UUID
+    sku: str
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
+    product: ProductBasic
