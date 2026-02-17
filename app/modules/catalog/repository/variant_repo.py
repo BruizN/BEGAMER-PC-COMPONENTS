@@ -83,3 +83,31 @@ async def get_variant_by_id(
         raise VariantNotFoundError(f"Variant with ID '{variant_id}' not found.")
 
     return variant
+
+async def update_variant(
+    session: AsyncSession,
+    variant_id: uuid.UUID,
+    update_data: dict
+) -> ProductVariant:
+    variant = await session.get(ProductVariant, variant_id)
+
+    if not variant:
+        raise VariantNotFoundError("Variant not found")
+
+    variant.sqlmodel_update(update_data)
+
+    session.add(variant)
+    try:
+        await session.flush()
+    except IntegrityError as e:
+        error_msg = str(e.orig) 
+
+        if "sku" in error_msg: 
+             raise SkuAlreadyExistsError(
+                f"The variant with SKU '{update_data["sku"]}' already exists."
+             )           
+             
+        raise e 
+
+    await session.refresh(variant, ["product", "updated_at"])
+    return variant

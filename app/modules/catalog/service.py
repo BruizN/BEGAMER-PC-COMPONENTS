@@ -244,3 +244,25 @@ async def get_variant(
     only_active: bool
 ) -> ProductVariant:
     return await var_repo.get_variant_by_id(session, variant_id, only_active)
+
+async def update_variant(
+    session: AsyncSession,
+    variant_id: uuid.UUID,
+    variant_update: ProductVariantUpdate
+) -> ProductVariant:
+    current_variant = await var_repo.get_variant_by_id(session, variant_id, False)
+    update_data = variant_update.model_dump(exclude_unset=True)
+    
+    if "attributes" in update_data:
+        parent_product = current_variant.product
+
+        new_sku = _generate_sku(
+            category_code=parent_product.category.code,
+            brand_code=parent_product.brand.code,
+            product_name=parent_product.name,
+            attributes=update_data["attributes"]
+        )
+
+        update_data["sku"] = new_sku
+
+    return await var_repo.update_variant(session, variant_id, update_data)

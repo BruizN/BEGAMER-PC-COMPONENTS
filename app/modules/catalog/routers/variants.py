@@ -78,3 +78,17 @@ async def get_variant(
         variant_id, 
         only_active=should_filter_active
     )
+
+@router.patch(
+    "/variants/{variant_id}",
+    response_model=ProductVariantRead,
+    status_code=status.HTTP_200_OK,
+    summary="Update a variant"
+)
+async def update_variant(
+    session: SessionDep,
+    admin: CurrentAdmin,
+    variant_id: uuid.UUID,
+    body: ProductVariantUpdate
+):
+    return await serv.update_variant(session, variant_id, body)
