@@ -202,16 +202,21 @@ async def brand_factory(db_session):
     return _create_brand
 
 @pytest.fixture
-async def product_factory(db_session):
+async def product_factory(db_session, category_factory, brand_factory):
     async def _create_product(
-        name: str, 
-        category: Category, 
-        brand: Brand, 
+        name: str = "Producto Genérico", # Damos valores por defecto útiles
+        category: Category | None = None, 
+        brand: Brand | None = None, 
         is_active: bool = True, 
-        description: str | None = None, 
+        description: str | None = "Descripción por defecto", 
         created_at: datetime | None = None, 
         updated_at: datetime | None = None
         ):
+
+        if not category:
+            category = await category_factory(name="Categoría Default", code="DEF")
+        if not brand:
+            brand = await brand_factory(name="Marca Default", code="DEF")
 
         nombre_producto = name
         nombre_marca = brand.name
@@ -222,16 +227,17 @@ async def product_factory(db_session):
             slug_text = f"{category.code} {nombre_marca} {nombre_producto}"
 
         generated_slug = slugify(slug_text)
+        
         product = Product(
             name=name, 
             description=description, 
             slug=generated_slug, 
             category_id=category.category_id, 
-            brand_id=brand.brand_id, 
+            brand_id=brand.brand_id,
             is_active=is_active, 
             created_at=created_at, 
             updated_at=updated_at
-            )
+        )
         db_session.add(product)
         await db_session.commit()
         await db_session.refresh(product)
