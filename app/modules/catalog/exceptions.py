@@ -41,3 +41,7 @@ class SkuAlreadyExistsError(CatalogError):
 class VariantNotFoundError(CatalogError):
     """Se lanza cuando no se encuentra la variante"""
     pass
+
+class VariantNotEmptyError(CatalogError):
+    """Se lanza al intentar borrar una variante asociada a ordenes"""
+    pass
