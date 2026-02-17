@@ -228,3 +228,19 @@ async def create_variant(
 
     return await var_repo.add_variant(session, new_variant)
     
+
+async def list_variants(
+    session: AsyncSession,
+    offset: int,
+    limit: int,
+    product_id: uuid.UUID,
+    is_active: bool | None = None
+) -> list[ProductVariant]:
+    return await var_repo.get_all_product_variants(session, offset, limit, product_id, is_active)
+
+async def get_variant(
+    session: AsyncSession,
+    variant_id: uuid.UUID,
+    only_active: bool
+) -> ProductVariant:
+    return await var_repo.get_variant_by_id(session, variant_id, only_active)

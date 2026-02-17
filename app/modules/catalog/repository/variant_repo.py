@@ -1,10 +1,13 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlmodel import select
+from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import IntegrityError
 import uuid
-from app.modules.catalog.models import ProductVariant
-from app.modules.catalog.schemas import ProductVariantCreate
+from app.modules.catalog.models import ProductVariant, Product
+from app.modules.catalog.schemas import ProductVariantCreate, ProductVariantUpdate
 from app.modules.catalog.exceptions import (
     SkuAlreadyExistsError,
+    VariantNotFoundError
     )
 
 
@@ -27,3 +30,56 @@ async def add_variant(
 
     await session.refresh(new_variant, ["product"])
     return new_variant
+    
+async def get_all_product_variants(
+    session: AsyncSession,
+    offset: int,
+    limit: int,
+    product_id: uuid.UUID,
+    is_active: bool | None = None
+) -> list[ProductVariant]:
+    
+    query = (
+        select(ProductVariant)
+        .options(
+            joinedload(ProductVariant.product).joinedload(Product.category),
+            joinedload(ProductVariant.product).joinedload(Product.brand)
+        )
+    )
+
+    if is_active is not None:
+        query = query.where(ProductVariant.is_active == is_active)
+
+    if product_id:
+        query = query.where(ProductVariant.product_id == product_id)
+
+    query = query.order_by(ProductVariant.created_at.desc())
+    query = query.offset(offset).limit(limit)
+    
+    result = await session.exec(query)
+    return list(result.unique().all())
+
+async def get_variant_by_id(
+    session: AsyncSession,
+    variant_id: uuid.UUID,
+    only_active: bool
+) -> ProductVariant:
+    query = (
+        select(ProductVariant)
+        .where(ProductVariant.variant_id == variant_id)
+        .options(
+            joinedload(ProductVariant.product).joinedload(Product.category),
+            joinedload(ProductVariant.product).joinedload(Product.brand)
+        )
+    )
+
+    if only_active:
+        query = query.where(ProductVariant.is_active)
+
+    result = await session.exec(query)
+    variant = result.first()
+
+    if not variant:
+        raise VariantNotFoundError(f"Variant with ID '{variant_id}' not found.")
+
+    return variant
