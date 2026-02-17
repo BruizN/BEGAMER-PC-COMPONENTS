@@ -111,3 +111,26 @@ async def update_variant(
 
     await session.refresh(variant, ["product", "updated_at"])
     return variant
+
+async def remove_variant(
+    session: AsyncSession,
+    variant_id: uuid.UUID
+) -> None:
+    variant = await session.get(ProductVariant, variant_id)
+
+    if not variant:
+        raise VariantNotFoundError("Variant not found")
+    
+    await session.delete(variant)
+
+    try:
+        await session.flush()
+
+    except IntegrityError as e:
+        if "foreign key constraint" in str(e.orig):
+            raise VariantNotEmptyError(
+                "Cannot delete variant: It is associated with existing orders. Please archive it instead."
+                )
+        raise e
+
+    return  

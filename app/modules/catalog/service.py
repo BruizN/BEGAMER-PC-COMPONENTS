@@ -266,3 +266,10 @@ async def update_variant(
         update_data["sku"] = new_sku
 
     return await var_repo.update_variant(session, variant_id, update_data)
+
+async def delete_variant(
+    session: AsyncSession,
+    variant_id: uuid.UUID
+) -> None:
+    await var_repo.remove_variant(session, variant_id)
+    return

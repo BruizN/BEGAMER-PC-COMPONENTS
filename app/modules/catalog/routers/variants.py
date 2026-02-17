@@ -92,3 +92,15 @@ async def update_variant(
     body: ProductVariantUpdate
 ):
     return await serv.update_variant(session, variant_id, body)
+
+@router.delete(
+    "/variants/{variant_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete an existing variant by ID, if the variant is associated with orders, it will not be deleted"
+)
+async def delete_variant(
+    session: SessionDep,
+    admin: CurrentAdmin,
+    variant_id: uuid.UUID
+):
+    return await serv.delete_variant(session, variant_id)
