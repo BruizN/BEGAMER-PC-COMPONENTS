@@ -11,7 +11,8 @@ from app.modules.catalog.exceptions import (
     ProductAlreadyExistsError,
     SkuAlreadyExistsError,
     VariantNotFoundError,
-    VariantNotEmptyError
+    VariantNotEmptyError,
+    ProductNotEmptyError
 )
 
 async def category_not_found_handler(request: Request, exc: CategoryNotFoundError):
@@ -36,6 +37,9 @@ async def product_not_found_handler(request: Request, exc: ProductNotFoundError)
     return JSONResponse(status_code=404, content={"detail": str(exc)})
 
 async def product_exists_handler(request: Request, exc: ProductAlreadyExistsError):
+    return JSONResponse(status_code=409, content={"detail": str(exc)})
+
+async def product_not_empty_handler(request: Request, exc: ProductNotEmptyError):
     return JSONResponse(status_code=409, content={"detail": str(exc)})
 
 async def sku_exists_handler(request: Request, exc: SkuAlreadyExistsError):

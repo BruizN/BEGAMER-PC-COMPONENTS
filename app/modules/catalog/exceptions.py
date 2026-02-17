@@ -34,6 +34,10 @@ class ProductAlreadyExistsError(CatalogError):
     """Se lanza cuando se intenta crear un producto duplicado"""
     pass
 
+class ProductNotEmptyError(CatalogError):
+    """Se lanza al intentar borrar un producto con variantes hijos"""
+    pass
+
 class SkuAlreadyExistsError(CatalogError):
     """Se lanza cuando se intenta crear una variante con un SKU duplicado"""
     pass
