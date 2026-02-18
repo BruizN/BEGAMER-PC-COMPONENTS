@@ -1,6 +1,6 @@
 @startuml
 set separator none
-title Nivel 2: Contenedores (Foco: Autenticación)
+title Nivel 2: Contenedores
 
 left to right direction
 
