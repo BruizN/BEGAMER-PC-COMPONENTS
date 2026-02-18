@@ -47,7 +47,7 @@ workspace {
         container ecommerce "Contenedores" {
             include *
             autolayout lr
-            title "Nivel 2: Contenedores (Foco: Autenticación)"
+            title "Nivel 2: Contenedores"
         }
         
         styles {
