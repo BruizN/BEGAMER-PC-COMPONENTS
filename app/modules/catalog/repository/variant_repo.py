@@ -4,10 +4,11 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import IntegrityError
 import uuid
 from app.modules.catalog.models import ProductVariant, Product
-from app.modules.catalog.schemas import ProductVariantCreate, ProductVariantUpdate
+from app.modules.catalog.schemas import ProductVariantCreate
 from app.modules.catalog.exceptions import (
     SkuAlreadyExistsError,
-    VariantNotFoundError
+    VariantNotFoundError,
+    VariantNotEmptyError
     )
 
 
