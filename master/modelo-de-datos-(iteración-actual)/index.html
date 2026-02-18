@@ -83,9 +83,21 @@
         DATETIME updated_at
     }
 
+    product_variant {
+        UUID product_variant_id PK "UUIDv7"
+        UUID product_id FK
+        VARCHAR sku UK "Unique"
+        DECIMAL price
+        INTEGER stock
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
     %% Relaciones
     category ||--|{ product : "clasifica a"
-    brand    ||--|{ product : "fabrica a"</code></pre></div>
+    brand    ||--|{ product : "fabrica a"
+    product  ||--|{ product_variant : "tiene variantes"</code></pre></div>
         </div>
       </div>
     </div>

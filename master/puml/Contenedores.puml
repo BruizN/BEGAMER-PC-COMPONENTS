@@ -16,7 +16,7 @@ System_Boundary("BEGamerComponents_boundary", "BEGamer Components", $tags="") {
   ContainerDb(BEGamerComponents.BasedeDatos, "Base de Datos", $techn="PostgreSQL 15-alpine", $descr="Almacena usuarios, roles, hashes de contraseñas, productos, marcas y categorías.", $tags="", $link="")
 }
 
-Rel(Administrador, BEGamerComponents.APIBackend, "Gestiona Categorías, Marcas y Productos (Swagger UI)", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(Administrador, BEGamerComponents.APIBackend, "Gestiona Categorías, Marcas, Productos y sus variantes (Swagger UI)", $techn="HTTPS/JSON", $tags="", $link="")
 Rel(Cliente, BEGamerComponents.APIBackend, "Consulta Productos Disponibles (Swagger UI)", $techn="HTTPS/JSON", $tags="", $link="")
 Rel(BEGamerComponents.APIBackend, BEGamerComponents.BasedeDatos, "Lee/Escribe datos del catálogo y usuarios", $techn="SQL/SQLModel", $tags="", $link="")
 
