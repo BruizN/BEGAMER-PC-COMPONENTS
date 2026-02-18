@@ -1,6 +1,5 @@
 import pytest
 from datetime import datetime, timezone, timedelta
-from slugify import slugify
 
 #Comprobar creación de producto y slug generado
 async def test_create_product_ok(
@@ -62,6 +61,42 @@ async def test_list_products_ok(
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 2
+
+#Comprobar filtro por is active con admin
+async def test_admin_list_products_by_is_active(
+    admin_client,
+    product_factory,
+    brand_factory,
+    category_factory
+):
+    brand = await brand_factory(name="asus", code="asu")
+    category = await category_factory(name="tarjeta de video", code="gpu")
+    await product_factory(name="Gaming GeForce RTX 4070 Twin Edge", brand=brand, category=category)
+    await product_factory(name="Gaming GeForce RTX 3070 Twin Edge", brand=brand, category=category, is_active=False)
+    await product_factory(name="Gaming GeForce RTX 2070 Twin Edge", brand=brand, category=category, is_active=False)
+    response = await admin_client.get("/catalog/products/?offset=0&limit=2&is_active=false")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 2
+
+#Comprobar filtro por is active con usuario común (no puede ver productos inactivos aunque se fuerze el filtro)
+async def test_user_list_products_by_is_active(
+    user_client,
+    product_factory,
+    brand_factory,
+    category_factory
+):
+    brand = await brand_factory(name="asus", code="asu")
+    category = await category_factory(name="tarjeta de video", code="gpu")
+    await product_factory(name="Gaming GeForce RTX 4070 Twin Edge", brand=brand, category=category)
+    await product_factory(name="Gaming GeForce RTX 3070 Twin Edge", brand=brand, category=category, is_active=False)
+    await product_factory(name="Gaming GeForce RTX 2070 Twin Edge", brand=brand, category=category, is_active=False)
+    response = await user_client.get("/catalog/products/?offset=0&limit=2&is_active=false")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 1
 
 
 # Listado filtrado por marca, categoría y búsqueda
@@ -180,9 +215,6 @@ async def test_admin_get_product_by_id(
     assert data["category_id"] == str(prod.category_id)
     assert data["brand_id"] == str(prod.brand_id)
     assert data["is_active"] == prod.is_active
-    
-
-    assert response.status_code == 200
 
     brand = await brand_factory(name="intel", code="int")
     cat = await category_factory(name="procesador", code="cpu")
