@@ -30,7 +30,7 @@ workspace {
         ecommerce -> sii "Solicita folio y timbre electrónico (Simulado)"
         ecommerce -> email_system "Envía correos electrónicos a clientes"
         # --- Relaciones nivel 2 ---
-        admin -> api "Gestiona Categorías, Marcas y Productos (Swagger UI)" "HTTPS/JSON"
+        admin -> api "Gestiona Categorías, Marcas, Productos y sus variantes (Swagger UI)" "HTTPS/JSON"
         cliente -> api "Consulta Productos Disponibles (Swagger UI)" "HTTPS/JSON"
         api -> database "Lee/Escribe datos del catálogo y usuarios" "SQL/SQLModel"
 
