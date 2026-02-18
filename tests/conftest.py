@@ -242,6 +242,8 @@ async def product_factory(db_session, category_factory, brand_factory):
         db_session.add(product)
         await db_session.commit()
         await db_session.refresh(product)
+        product.category = category
+        product.brand = brand
         return product
     return _create_product
 
