@@ -15,7 +15,8 @@ from app.main import app
 from app.core.db import get_db 
 from app.core.security import hash_password, create_access_token
 from app.modules.auth.models import User
-from app.modules.catalog.models import Category, Brand, Product
+from app.modules.catalog.models import Category, Brand, Product, ProductVariant
+from app.modules.catalog.service import _generate_sku
 
 load_dotenv()
 
@@ -202,16 +203,21 @@ async def brand_factory(db_session):
     return _create_brand
 
 @pytest.fixture
-async def product_factory(db_session):
+async def product_factory(db_session, category_factory, brand_factory):
     async def _create_product(
-        name: str, 
-        category: Category, 
-        brand: Brand, 
+        name: str = "Producto Genérico", 
+        category: Category | None = None, 
+        brand: Brand | None = None, 
         is_active: bool = True, 
-        description: str | None = None, 
+        description: str | None = "Descripción por defecto", 
         created_at: datetime | None = None, 
         updated_at: datetime | None = None
         ):
+
+        if not category:
+            category = await category_factory(name="Categoría Default", code="DEF")
+        if not brand:
+            brand = await brand_factory(name="Marca Default", code="DEF")
 
         nombre_producto = name
         nombre_marca = brand.name
@@ -222,18 +228,62 @@ async def product_factory(db_session):
             slug_text = f"{category.code} {nombre_marca} {nombre_producto}"
 
         generated_slug = slugify(slug_text)
+        
         product = Product(
             name=name, 
             description=description, 
             slug=generated_slug, 
             category_id=category.category_id, 
-            brand_id=brand.brand_id, 
+            brand_id=brand.brand_id,
             is_active=is_active, 
             created_at=created_at, 
             updated_at=updated_at
-            )
+        )
         db_session.add(product)
         await db_session.commit()
         await db_session.refresh(product)
+        product.category = category
+        product.brand = brand
         return product
     return _create_product
+
+@pytest.fixture
+async def variant_factory(db_session, product_factory):
+    async def _create_variant(
+        attributes: str = "Standard Edition",
+        price: float = 100.0,
+        stock: int = 10,
+        product: Product | None = None,
+        is_active: bool = True,
+        created_at: datetime | None = None, 
+        updated_at: datetime | None = None
+    ):
+        if not product:
+            product = await product_factory()
+
+        #Generacion de SKU
+        generated_sku = _generate_sku(
+            category_code=product.category.code,
+            brand_code=product.brand.code,
+            product_name=product.name,
+            attributes=attributes
+        )
+
+        variant = ProductVariant(
+            product_id=product.product_id,
+            sku=generated_sku,
+            attributes=attributes,
+            price=price,
+            stock=stock,
+            is_active=is_active,
+            created_at=created_at,
+            updated_at=updated_at
+        )
+        
+        db_session.add(variant)
+        await db_session.commit()
+        await db_session.refresh(variant)
+        return variant
+    return _create_variant
+        
+        

@@ -33,3 +33,19 @@ class ProductNotFoundError(CatalogError):
 class ProductAlreadyExistsError(CatalogError):
     """Se lanza cuando se intenta crear un producto duplicado"""
     pass
+
+class ProductNotEmptyError(CatalogError):
+    """Se lanza al intentar borrar un producto con variantes hijos"""
+    pass
+
+class SkuAlreadyExistsError(CatalogError):
+    """Se lanza cuando se intenta crear una variante con un SKU duplicado"""
+    pass
+
+class VariantNotFoundError(CatalogError):
+    """Se lanza cuando no se encuentra la variante"""
+    pass
+
+class VariantNotEmptyError(CatalogError):
+    """Se lanza al intentar borrar una variante asociada a ordenes"""
+    pass

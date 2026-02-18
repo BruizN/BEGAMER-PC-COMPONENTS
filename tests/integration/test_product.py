@@ -1,6 +1,5 @@
 import pytest
 from datetime import datetime, timezone, timedelta
-from slugify import slugify
 
 #Comprobar creación de producto y slug generado
 async def test_create_product_ok(
@@ -18,23 +17,15 @@ async def test_create_product_ok(
         "category_id": str(category.category_id)
     }
 
-    nombre_producto = payload["name"]
-    nombre_marca = brand.name
-
-    if nombre_producto.lower().startswith(nombre_marca.lower()):
-        slug_text = f"{category.code} {nombre_producto}" 
-    else:
-        slug_text = f"{category.code} {nombre_marca} {nombre_producto}"
-
-    generated_slug = slugify(slug_text)
-    payload["slug"] = generated_slug
-
     response = await admin_client.post("/catalog/products/", json=payload)
 
     assert response.status_code == 201
     data = response.json()
 
-    assert data["slug"] == generated_slug
+    # El string esperado fijo.
+    expected_slug = "gpu-corsair-gaming-geforce-rtx-4070-twin-edge"
+
+    assert data["slug"] == expected_slug
     assert "product_id" in data
 
 #Comprobar paginación y que siendo admin se vean todos los productos activos e inactivos
@@ -44,15 +35,7 @@ async def test_list_products_ok(
     category_factory,
     product_factory
 ):
-    brand1 = await brand_factory(name="zotac", code="zot")
-    cat1 = await category_factory(name="tarjeta de video", code="gpu")
-    await product_factory(
-        name="Gaming GeForce RTX 4070 Twin Edge", 
-        description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
-        category=cat1, 
-        brand=brand1,
-        is_active=False
-        )
+    await product_factory(name="Gaming GeForce RTX 4070 Twin Edge")
 
     brand2 = await brand_factory(name="intel", code="int")
     cat2 = await category_factory(name="Procesador", code="cpu")
@@ -78,6 +61,42 @@ async def test_list_products_ok(
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 2
+
+#Comprobar filtro por is active con admin
+async def test_admin_list_products_by_is_active(
+    admin_client,
+    product_factory,
+    brand_factory,
+    category_factory
+):
+    brand = await brand_factory(name="asus", code="asu")
+    category = await category_factory(name="tarjeta de video", code="gpu")
+    await product_factory(name="Gaming GeForce RTX 4070 Twin Edge", brand=brand, category=category)
+    await product_factory(name="Gaming GeForce RTX 3070 Twin Edge", brand=brand, category=category, is_active=False)
+    await product_factory(name="Gaming GeForce RTX 2070 Twin Edge", brand=brand, category=category, is_active=False)
+    response = await admin_client.get("/catalog/products/?offset=0&limit=2&is_active=false")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 2
+
+#Comprobar filtro por is active con usuario común (no puede ver productos inactivos aunque se fuerze el filtro)
+async def test_user_list_products_by_is_active(
+    user_client,
+    product_factory,
+    brand_factory,
+    category_factory
+):
+    brand = await brand_factory(name="asus", code="asu")
+    category = await category_factory(name="tarjeta de video", code="gpu")
+    await product_factory(name="Gaming GeForce RTX 4070 Twin Edge", brand=brand, category=category)
+    await product_factory(name="Gaming GeForce RTX 3070 Twin Edge", brand=brand, category=category, is_active=False)
+    await product_factory(name="Gaming GeForce RTX 2070 Twin Edge", brand=brand, category=category, is_active=False)
+    response = await user_client.get("/catalog/products/?offset=0&limit=2&is_active=false")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 1
 
 
 # Listado filtrado por marca, categoría y búsqueda
@@ -141,15 +160,7 @@ async def test_list_products_user_ok(
     brand_factory,
     product_factory
 ):
-    brand1 = await brand_factory(name="zotac", code="zot")
-    cat1 = await category_factory(name="tarjeta de video", code="gpu")
-    await product_factory(
-        name="Gaming GeForce RTX 4070 Twin Edge", 
-        description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
-        category=cat1, 
-        brand=brand1,
-        is_active=False
-        )
+    await product_factory(name="Gaming GeForce RTX 4070 Twin Edge", is_active=False)
 
     brand2 = await brand_factory(name="intel", code="int")
     cat2 = await category_factory(name="Procesador", code="cpu")
@@ -183,14 +194,7 @@ async def test_user_get_product_by_id_denied(
     category_factory,
     product_factory
 ):
-    brand = await brand_factory(name="asus", code="asu")
-    cat = await category_factory(name="tarjeta de video", code="gpu")
-    prod = await product_factory(
-        name="Gaming GeForce RTX 4070 Twin Edge", 
-        description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
-        category=cat, brand=brand, 
-        is_active=False
-        )
+    prod = await product_factory(name="Gaming GeForce RTX 4070", is_active=False)
     response = await user_client.get(f"/catalog/products/{prod.product_id}")
     assert response.status_code == 404
 
@@ -201,13 +205,7 @@ async def test_admin_get_product_by_id(
     category_factory,
     product_factory
 ):
-    brand = await brand_factory(name="asus", code="asu")
-    cat = await category_factory(name="tarjeta de video", code="gpu")
-    prod = await product_factory(
-        name="Gaming GeForce RTX 4070 Twin Edge", 
-        description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
-        category=cat, brand=brand
-        )
+    prod = await product_factory(name="Gaming GeForce RTX 4070")
     response = await admin_client.get(f"/catalog/products/{prod.product_id}")
     assert response.status_code == 200
     data = response.json()
@@ -217,16 +215,13 @@ async def test_admin_get_product_by_id(
     assert data["category_id"] == str(prod.category_id)
     assert data["brand_id"] == str(prod.brand_id)
     assert data["is_active"] == prod.is_active
-    
 
-    assert response.status_code == 200
-
-    brand2 = await brand_factory(name="intel", code="int")
-    cat2 = await category_factory(name="procesador", code="cpu")
+    brand = await brand_factory(name="intel", code="int")
+    cat = await category_factory(name="procesador", code="cpu")
     prod2 = await product_factory(
         name="Core i9-14900K", 
         description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
-        category=cat2, brand=brand2, is_active=False
+        category=cat, brand=brand, is_active=False
         )
     response = await admin_client.get(f"/catalog/products/{prod2.product_id}")
     assert response.status_code == 200
@@ -245,8 +240,7 @@ async def test_update_product_ok(
     cat = await category_factory(name="procesador", code="cpu")
     
     product = await product_factory(
-        name="Core i9-14900K", 
-        description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
+        name="Core i9-14900K",
         category=cat, brand=brand,
         created_at=past_date,
         updated_at=past_date
@@ -283,16 +277,11 @@ async def test_delete_product(
     admin_client,
     category_factory,
     product_factory,
-    brand_factory
+    brand_factory,
+    variant_factory
 ):
 
-    brand = await brand_factory(name="asus", code="asu")
-    cat = await category_factory(name="tarjeta de video", code="gpu")
-    prod = await product_factory(
-        name="Gaming GeForce RTX 4070 Twin Edge", 
-        description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
-        category=cat, brand=brand
-        )
+    prod = await product_factory(name="Core i9-14900K")
 
     response = await admin_client.delete(
         f"/catalog/products/{prod.product_id}"
@@ -300,9 +289,21 @@ async def test_delete_product(
     
     assert response.status_code == 204
 
-    #TODO: Comprobar que no se puede eliminar un producto que tenga variantes
+    #Comprobar que no se puede eliminar un producto que tenga variantes
+    category = await category_factory(name="Tarjeta de video", code="gpu")
+    brand = await brand_factory(name="Zotac", code="zot")
+    prod2 = await product_factory(
+        name="Gaming GeForce RTX 4070 Twin Edge", 
+        category=category, 
+        brand=brand
+        )
+    await variant_factory(product=prod2)
+
+    response = await admin_client.delete(
+        f"/catalog/products/{prod2.product_id}"
+        )
     
-    # assert response.status_code == 409
+    assert response.status_code == 409
 
 
 
@@ -339,15 +340,11 @@ async def test_deny_duplicated_product_mofication(
     product_factory
 ):
     # Crea el producto que se va a editar
-    brand = await brand_factory(name="intel", code="int")
-    cat = await category_factory(name="procesador", code="cpu")
-    prod = await product_factory(
-        name="Core i9-14900K", 
-        description="lorem ipsum dolor sit amet consectetur adipiscing elit", 
-        category=cat, brand=brand
-        )
+    prod = await product_factory(name="Core i9-14900K")
     
     # Crea el producto "rival" (el que ya tiene el nombre ocupado)
+    brand = await brand_factory(name="intel", code="int")
+    cat = await category_factory(name="procesador", code="cpu")
     await product_factory(
         name="Core i5-14600K", 
         description="lorem ipsum dolor sit amet consectetur adipiscing elit", 

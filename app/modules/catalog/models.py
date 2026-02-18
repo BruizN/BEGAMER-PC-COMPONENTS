@@ -1,23 +1,28 @@
 from sqlmodel import Field, Relationship
 from app.core.AuditMixin import AuditMixin
-from app.modules.catalog.schemas import CategoryBase, BrandBase, ProductBase
+from app.modules.catalog.schemas import CategoryBase, BrandBase, ProductBase, ProductVariantBase
+from sqlalchemy import Column, Numeric
+from decimal import Decimal
 import uuid
 import uuid6
 
 
 class Category(CategoryBase, AuditMixin, table=True):
+    __tablename__ = "category"
     name: str = Field(unique=True, index=True)
     code: str = Field(unique=True, index=True)
     category_id: uuid.UUID = Field(default_factory=uuid6.uuid7, primary_key=True)
     products: list["Product"] = Relationship(back_populates="category", passive_deletes=True)
 
 class Brand(BrandBase, AuditMixin, table=True):
+    __tablename__ = "brand"
     name: str = Field(unique=True, index=True)
     code: str = Field(unique=True, index=True)
     brand_id: uuid.UUID = Field(default_factory=uuid6.uuid7, primary_key=True)
     products: list["Product"] = Relationship(back_populates="brand", passive_deletes=True) #evita la actualizacion de hijos a none al eliminar el padre
 
 class Product(ProductBase, AuditMixin, table=True):
+    __tablename__ = "product"
     product_id: uuid.UUID = Field(default_factory=uuid6.uuid7, primary_key=True)
     name: str = Field(unique=True, index=True)
     slug: str = Field(unique=True, index=True)
@@ -25,3 +30,12 @@ class Product(ProductBase, AuditMixin, table=True):
     brand_id: uuid.UUID = Field(foreign_key="brand.brand_id")
     category: "Category" = Relationship(back_populates="products")
     brand: "Brand" = Relationship(back_populates="products")
+    variants: list["ProductVariant"] = Relationship(back_populates="product", passive_deletes=True)
+
+class ProductVariant(ProductVariantBase, AuditMixin, table=True):
+    __tablename__ = "product_variant"
+    variant_id: uuid.UUID = Field(default_factory=uuid6.uuid7, primary_key=True)
+    product_id: uuid.UUID = Field(foreign_key="product.product_id")
+    sku: str = Field(unique=True, index=True)
+    price: Decimal = Field(sa_column=Column(Numeric(10, 2), nullable=False))
+    product: "Product" = Relationship(back_populates="variants")

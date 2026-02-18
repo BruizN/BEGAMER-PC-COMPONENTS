@@ -1,18 +1,37 @@
 from app.modules.catalog.repository import category_repo as cat_repo
 from app.modules.catalog.repository import brand_repo as brand_repo
 from app.modules.catalog.repository import product_repo as prod_repo
-from app.modules.catalog.models import Category, Brand, Product
+from app.modules.catalog.repository import variant_repo as var_repo
+from app.modules.catalog.models import Category, Brand, Product, ProductVariant
 from app.modules.catalog.schemas import (
     CategoryCreate, 
     CategoryUpdate,
     BrandCreate,
     BrandUpdate,
     ProductCreate,
-    ProductUpdate
+    ProductUpdate,
+    ProductVariantCreate,
+    ProductVariantUpdate
 )
 from sqlmodel.ext.asyncio.session import AsyncSession
 from slugify import slugify
 import uuid
+
+def _generate_sku(
+    category_code: str,
+    brand_code: str,
+    product_name: str,
+    attributes: str
+) -> str:
+    """
+    Genera un SKU limpio y estandarizado.
+    Ejemplo: GPU - ASU - RTX-4060 - WHITE-8GB
+    """
+
+    clean_product = slugify(product_name).upper()
+    clean_attributes = slugify(attributes).upper()
+
+    return f"{category_code}-{brand_code}-{clean_product}-{clean_attributes}"
 
 async def create_category(
     session: AsyncSession,
@@ -182,4 +201,75 @@ async def delete_product(
     product_id: uuid.UUID
 ) -> None:
     await prod_repo.remove_product(session, product_id)
+    return
+
+
+async def create_variant(
+    session: AsyncSession,
+    product_id: uuid.UUID,
+    variant_data: ProductVariantCreate
+) -> ProductVariant:
+    product = await prod_repo.get_product(session, product_id, True)
+
+    generated_sku = _generate_sku(
+        category_code=product.category.code,
+        brand_code=product.brand.code,
+        product_name=product.name,
+        attributes=variant_data.attributes
+    )
+
+    new_variant = ProductVariant.model_validate(
+        variant_data,
+        update={
+            "sku": generated_sku,
+            "product_id": product_id
+        }
+    )
+
+    return await var_repo.add_variant(session, new_variant)
+    
+
+async def list_variants(
+    session: AsyncSession,
+    offset: int,
+    limit: int,
+    product_id: uuid.UUID,
+    is_active: bool | None = None
+) -> list[ProductVariant]:
+    return await var_repo.get_all_product_variants(session, offset, limit, product_id, is_active)
+
+async def get_variant(
+    session: AsyncSession,
+    variant_id: uuid.UUID,
+    only_active: bool
+) -> ProductVariant:
+    return await var_repo.get_variant_by_id(session, variant_id, only_active)
+
+async def update_variant(
+    session: AsyncSession,
+    variant_id: uuid.UUID,
+    variant_update: ProductVariantUpdate
+) -> ProductVariant:
+    current_variant = await var_repo.get_variant_by_id(session, variant_id, False)
+    update_data = variant_update.model_dump(exclude_unset=True)
+    
+    if "attributes" in update_data:
+        parent_product = current_variant.product
+
+        new_sku = _generate_sku(
+            category_code=parent_product.category.code,
+            brand_code=parent_product.brand.code,
+            product_name=parent_product.name,
+            attributes=update_data["attributes"]
+        )
+
+        update_data["sku"] = new_sku
+
+    return await var_repo.update_variant(session, variant_id, update_data)
+
+async def delete_variant(
+    session: AsyncSession,
+    variant_id: uuid.UUID
+) -> None:
+    await var_repo.remove_variant(session, variant_id)
     return
