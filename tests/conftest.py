@@ -16,6 +16,7 @@ from app.core.db import get_db
 from app.core.security import hash_password, create_access_token
 from app.modules.auth.models import User
 from app.modules.catalog.models import Category, Brand, Product, ProductVariant
+from app.modules.catalog.service import _generate_sku
 
 load_dotenv()
 
