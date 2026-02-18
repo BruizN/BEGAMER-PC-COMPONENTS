@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from app.modules.catalog import service as serv
 from app.core.dependencies import SessionDep, CurrentAdmin, CurrentUserOptional
 import uuid
-from fastapi import APIRouter, status, Query
+from fastapi import status, Query
 from app.modules.catalog.schemas import (
     ProductVariantCreate, 
     ProductVariantRead, 
