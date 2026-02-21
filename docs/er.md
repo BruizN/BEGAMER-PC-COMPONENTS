@@ -8,8 +8,8 @@ erDiagram
         UUID user_id PK "UUIDv7"
         VARCHAR email UK "Unique"
         VARCHAR hashed_password
-        VARCHAR role
-        BOOLEAN is_active
+        VARCHAR role "Default: client"
+        BOOLEAN is_active "Default: True"
         DATETIME created_at
         DATETIME updated_at
     }
@@ -18,7 +18,7 @@ erDiagram
         UUID category_id PK "UUIDv7"
         VARCHAR name UK
         VARCHAR code UK "Ej: GPU"
-        BOOLEAN is_active
+        BOOLEAN is_active "Default: True"
         DATETIME created_at
         DATETIME updated_at
     }
@@ -27,7 +27,7 @@ erDiagram
         UUID brand_id PK "UUIDv7"
         VARCHAR name UK
         VARCHAR code UK "Ej: ASU"
-        BOOLEAN is_active
+        BOOLEAN is_active "Default: True"
         DATETIME created_at
         DATETIME updated_at
     }
@@ -35,27 +35,41 @@ erDiagram
     product {
         UUID product_id PK "UUIDv7"
         VARCHAR name UK "Unique, Index"
-        VARCHAR model_slug UK "Unique, Index"
+        VARCHAR slug UK "Unique, Index"
         TEXT description
         UUID category_id FK
         UUID brand_id FK
-        BOOLEAN is_active
+        BOOLEAN is_active "Default: True"
         DATETIME created_at
         DATETIME updated_at
     }
 
     product_variant {
-        UUID product_variant_id PK "UUIDv7"
+        UUID variant_id PK "UUIDv7"
         UUID product_id FK
         VARCHAR sku UK "Unique"
         DECIMAL price
         INTEGER stock
-        BOOLEAN is_active
+        BOOLEAN is_active "Default: True"
         DATETIME created_at
         DATETIME updated_at
     }
 
-    %% Relaciones
-    category ||--|{ product : "clasifica a"
-    brand    ||--|{ product : "fabrica a"
-    product  ||--|{ product_variant : "tiene variantes"
+    product_image {
+        UUID image_id PK "UUIDv7"
+        VARCHAR image_url
+        BOOLEAN is_main "Default: False"
+        UUID product_id FK 
+        UUID variant_id FK "Nullable"
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    %% Relaciones (Corregidas a "Cero o Muchos")
+    category ||--o{ product : "clasifica a"
+    brand    ||--o{ product : "fabrica a"
+    product  ||--o{ product_variant : "tiene variantes"
+    
+    %% Relaciones de Imágenes
+    product         ||--o{ product_image : "tiene fotos genéricas"
+    product_variant ||--o{ product_image : "tiene fotos específicas"
