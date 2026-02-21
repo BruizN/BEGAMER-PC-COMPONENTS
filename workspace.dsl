@@ -22,17 +22,20 @@ workspace {
         
         sii = softwareSystem "Servicio Impuestos Internos (Mock)" "Simula la validación y emisión de boletas para fines académicos." "External System"
         email_system = softwareSystem "Sistema de Correo" "Envía confirmaciones de órdenes y recuperación de claves." "External System"
+        aws_s3 = softwareSystem "AWS S3" "Almacena imágenes de productos y variantes." "External System"
    
         # --- Relaciones nivel 1 ---
         cliente -> ecommerce "Busca componentes y compra"
         admin -> ecommerce "Gestiona inventario"
+        ecommerce -> aws_s3 "Almacena imágenes de productos"
         ecommerce -> webpay "Inicia transacción y valida estado"
         ecommerce -> sii "Solicita folio y timbre electrónico (Simulado)"
         ecommerce -> email_system "Envía correos electrónicos a clientes"
-        # --- Relaciones nivel 2 ---
+        # --- Relaciones nivel 2(Iteracion actual) ---
         admin -> api "Gestiona Categorías, Marcas, Productos y sus variantes (Swagger UI)" "HTTPS/JSON"
         cliente -> api "Consulta Productos Disponibles (Swagger UI)" "HTTPS/JSON"
         api -> database "Lee/Escribe datos del catálogo y usuarios" "SQL/SQLModel"
+        api -> aws_s3 "Lee/Escribe imágenes de productos y variantes" "HTTPS / S3 API"
 
 
     }
