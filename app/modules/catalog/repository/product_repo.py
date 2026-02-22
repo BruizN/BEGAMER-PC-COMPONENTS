@@ -33,7 +33,7 @@ async def add_product(
              
         raise e 
 
-    await session.refresh(new_product, ["category", "brand"])
+    await session.refresh(new_product, ["category", "brand", "images"])
     return new_product
 
 async def get_product(
@@ -46,7 +46,8 @@ async def get_product(
         .where(Product.product_id == product_id)
         .options(
             joinedload(Product.brand),
-            joinedload(Product.category)
+            joinedload(Product.category),
+            joinedload(Product.images)
         )
     )
 
@@ -72,7 +73,8 @@ async def get_all_products(
         select(Product)
         .options(
             joinedload(Product.brand),
-            joinedload(Product.category)
+            joinedload(Product.category),
+            joinedload(Product.images)
         )
     )
 
@@ -129,7 +131,7 @@ async def update_product(
              
         raise e 
 
-    await session.refresh(product, ["category", "brand", "updated_at"])
+    await session.refresh(product, ["category", "brand", "images", "updated_at"])
     return product
 
 
