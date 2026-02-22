@@ -51,15 +51,6 @@ class ProductBase(SQLModel):
 class ProductCreate(ProductBase):
     pass
 
-class ProductRead(ProductBase):
-    product_id: uuid.UUID
-    slug: str
-    is_active: bool
-    created_at: datetime
-    updated_at: datetime
-    category: CategoryRead
-    brand: BrandRead
-
 class ProductUpdate(SQLModel):
     name: CleanText | None = Field(default=None, min_length=3, max_length=150)
     description: CleanText | None = None
@@ -100,6 +91,40 @@ class ProductBasic(SQLModel):
     category: CategoryBasic 
     brand: BrandBasic
 
+class ProductImageBase(SQLModel):
+    is_main: bool = False
+
+class ProductImageCreate(ProductImageBase):
+    """
+    Este esquema se usa internamente en el Service.
+    El router recibirá un UploadFile, lo subirá a S3, obtendrá la URL
+    y con eso armará este objeto para guardarlo en BD.
+    """
+    image_url: str
+    product_id: uuid.UUID
+    variant_id: uuid.UUID | None = None
+
+class ProductImageUpdate(SQLModel):
+    is_main: bool | None = None
+
+class ProductImageRead(ProductImageBase):
+    image_id: uuid.UUID
+    image_url: str
+    product_id: uuid.UUID
+    variant_id: uuid.UUID | None = None
+    created_at: datetime
+    updated_at: datetime
+
+class ProductRead(ProductBase):
+    product_id: uuid.UUID
+    slug: str
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
+    category: CategoryRead
+    brand: BrandRead
+    images: list[ProductImageRead] = []
+
 class ProductVariantRead(ProductVariantBase):
     variant_id: uuid.UUID
     sku: str
@@ -107,3 +132,4 @@ class ProductVariantRead(ProductVariantBase):
     created_at: datetime
     updated_at: datetime
     product: ProductBasic
+    images: list[ProductImageRead] = []
