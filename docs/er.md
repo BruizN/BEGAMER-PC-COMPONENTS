@@ -56,7 +56,7 @@ erDiagram
     }
 
     product_image {
-        UUID image_id PK "UUIDv7"
+        UUID image_id PK "UUIDv7, Index"
         VARCHAR image_url
         BOOLEAN is_main "Default: False"
         UUID product_id FK 
