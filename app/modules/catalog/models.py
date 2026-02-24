@@ -1,6 +1,6 @@
 from sqlmodel import Field, Relationship
 from app.core.AuditMixin import AuditMixin
-from app.modules.catalog.schemas import CategoryBase, BrandBase, ProductBase, ProductVariantBase
+from app.modules.catalog.schemas import CategoryBase, BrandBase, ProductBase, ProductVariantBase, ProductImageBase
 from sqlalchemy import Column, Numeric
 from decimal import Decimal
 import uuid
@@ -42,7 +42,7 @@ class ProductVariant(ProductVariantBase, AuditMixin, table=True):
     product: "Product" = Relationship(back_populates="variants")
     images: list["ProductImage"] = Relationship(back_populates="variant", passive_deletes=True)
 
-class ProductImage(AuditMixin, table=True):
+class ProductImage(ProductImageBase, AuditMixin, table=True):
     __tablename__ = "product_image"
     image_id: uuid.UUID = Field(default_factory=uuid6.uuid7, primary_key=True, index=True)
     image_url: str
