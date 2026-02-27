@@ -1,11 +1,9 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 import uuid
 
 from app.core.aws import upload_image_to_s3, delete_image_from_s3
 from app.core.dependencies import CurrentAdmin, SessionDep
-from app.modules.catalog.models import ProductImage
-from app.modules.catalog.schemas import ProductImageCreate, ProductImageRead, ProductImageUpdate
+from app.modules.catalog.schemas import ProductImageCreate, ProductImageRead
 from app.modules.catalog import service as serv
 
 router = APIRouter(tags=["Images"])

@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import patch
 from io import BytesIO
 
@@ -34,7 +33,7 @@ async def test_upload_product_image_ok(
     response_data = response.json()
     
     assert response_data["image_url"] == "https://fake-bucket.s3.amazonaws.com/test-image.jpg"
-    assert response_data["is_main"] == True
+    assert response_data["is_main"]
     assert response_data["product_id"] == str(product.product_id)
 
     mock_upload.assert_called_once()
