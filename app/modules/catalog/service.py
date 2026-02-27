@@ -2,7 +2,8 @@ from app.modules.catalog.repository import category_repo as cat_repo
 from app.modules.catalog.repository import brand_repo as brand_repo
 from app.modules.catalog.repository import product_repo as prod_repo
 from app.modules.catalog.repository import variant_repo as var_repo
-from app.modules.catalog.models import Category, Brand, Product, ProductVariant
+from app.modules.catalog.repository import image_repo as image_repo
+from app.modules.catalog.models import Category, Brand, Product, ProductVariant, ProductImage
 from app.modules.catalog.schemas import (
     CategoryCreate, 
     CategoryUpdate,
@@ -11,7 +12,8 @@ from app.modules.catalog.schemas import (
     ProductCreate,
     ProductUpdate,
     ProductVariantCreate,
-    ProductVariantUpdate
+    ProductVariantUpdate,
+    ProductImageCreate
 )
 from sqlmodel.ext.asyncio.session import AsyncSession
 from slugify import slugify
@@ -272,4 +274,23 @@ async def delete_variant(
     variant_id: uuid.UUID
 ) -> None:
     await var_repo.remove_variant(session, variant_id)
+    return
+
+async def create_image(
+    session: AsyncSession,
+    image_data: ProductImageCreate
+) -> ProductImage:
+    if image_data.is_main:
+        await image_repo.unset_main_image(session, image_data.product_id, image_data.variant_id)
+    new_image = ProductImage.model_validate(image_data)
+    return await image_repo.add_image(session, new_image)
+
+async def get_image(
+    session: AsyncSession,
+    image_id: uuid.UUID
+):
+    return await image_repo.get_image_by_id(session, image_id)
+
+async def delete_image(session, image_id) -> None:
+    await image_repo.remove_image(session, image_id)
     return

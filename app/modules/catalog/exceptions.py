@@ -49,3 +49,7 @@ class VariantNotFoundError(CatalogError):
 class VariantNotEmptyError(CatalogError):
     """Se lanza al intentar borrar una variante asociada a ordenes"""
     pass
+
+class ImageNotFoundError(CatalogError):
+    """Se lanza cuando no se encuentra la imagen"""
+    pass

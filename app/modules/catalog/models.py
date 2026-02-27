@@ -1,6 +1,6 @@
 from sqlmodel import Field, Relationship
 from app.core.AuditMixin import AuditMixin
-from app.modules.catalog.schemas import CategoryBase, BrandBase, ProductBase, ProductVariantBase
+from app.modules.catalog.schemas import CategoryBase, BrandBase, ProductBase, ProductVariantBase, ProductImageBase
 from sqlalchemy import Column, Numeric
 from decimal import Decimal
 import uuid
@@ -31,6 +31,7 @@ class Product(ProductBase, AuditMixin, table=True):
     category: "Category" = Relationship(back_populates="products")
     brand: "Brand" = Relationship(back_populates="products")
     variants: list["ProductVariant"] = Relationship(back_populates="product", passive_deletes=True)
+    images: list["ProductImage"] = Relationship(back_populates="product", passive_deletes=True)
 
 class ProductVariant(ProductVariantBase, AuditMixin, table=True):
     __tablename__ = "product_variant"
@@ -39,3 +40,13 @@ class ProductVariant(ProductVariantBase, AuditMixin, table=True):
     sku: str = Field(unique=True, index=True)
     price: Decimal = Field(sa_column=Column(Numeric(10, 2), nullable=False))
     product: "Product" = Relationship(back_populates="variants")
+    images: list["ProductImage"] = Relationship(back_populates="variant", passive_deletes=True)
+
+class ProductImage(ProductImageBase, AuditMixin, table=True):
+    __tablename__ = "product_image"
+    image_id: uuid.UUID = Field(default_factory=uuid6.uuid7, primary_key=True, index=True)
+    image_url: str
+    product_id: uuid.UUID = Field(default=None, foreign_key="product.product_id")
+    variant_id: uuid.UUID | None = Field(default=None, foreign_key="product_variant.variant_id")
+    product: "Product" = Relationship(back_populates="images")
+    variant: "ProductVariant" = Relationship(back_populates="images")

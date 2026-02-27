@@ -29,7 +29,7 @@ async def add_variant(
              
         raise e 
 
-    await session.refresh(new_variant, ["product"])
+    await session.refresh(new_variant, ["product", "images"])
     return new_variant
     
 async def get_all_product_variants(
@@ -44,7 +44,8 @@ async def get_all_product_variants(
         select(ProductVariant)
         .options(
             joinedload(ProductVariant.product).joinedload(Product.category),
-            joinedload(ProductVariant.product).joinedload(Product.brand)
+            joinedload(ProductVariant.product).joinedload(Product.brand),
+            joinedload(ProductVariant.images)
         )
     )
 
@@ -70,7 +71,8 @@ async def get_variant_by_id(
         .where(ProductVariant.variant_id == variant_id)
         .options(
             joinedload(ProductVariant.product).joinedload(Product.category),
-            joinedload(ProductVariant.product).joinedload(Product.brand)
+            joinedload(ProductVariant.product).joinedload(Product.brand),
+            joinedload(ProductVariant.images)
         )
     )
 
@@ -110,7 +112,7 @@ async def update_variant(
              
         raise e 
 
-    await session.refresh(variant, ["product", "updated_at"])
+    await session.refresh(variant, ["product", "images", "updated_at"])
     return variant
 
 async def remove_variant(

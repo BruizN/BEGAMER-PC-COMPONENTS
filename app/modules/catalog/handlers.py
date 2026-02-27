@@ -12,7 +12,8 @@ from app.modules.catalog.exceptions import (
     SkuAlreadyExistsError,
     VariantNotFoundError,
     VariantNotEmptyError,
-    ProductNotEmptyError
+    ProductNotEmptyError,
+    ImageNotFoundError
 )
 
 async def category_not_found_handler(request: Request, exc: CategoryNotFoundError):
@@ -50,3 +51,6 @@ async def variant_not_found_handler(request: Request, exc: VariantNotFoundError)
 
 async def variant_not_empty_handler(request: Request, exc: VariantNotEmptyError):
     return JSONResponse(status_code=409, content={"detail": str(exc)})
+
+async def image_not_found_handler(request: Request, exc: ImageNotFoundError):
+    return JSONResponse(status_code=404, content={"detail": str(exc)})
