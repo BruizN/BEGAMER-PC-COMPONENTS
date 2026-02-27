@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Almacenamiento de Archivos Multimedia: AWS S3 y Boto3 | Name</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css" rel="stylesheet">
+    <link href="../../../style.css" rel="stylesheet">
+    <link href="./../../style-branding.css" rel="stylesheet">
+    <script type="text/javascript" src="../../../modal.js"></script>
+    <script type="text/javascript" src="../../../svg-modal.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.2/dist/svg-pan-zoom.min.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript" src="../../../header.js"></script>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand has-site-branding"><a href="../../" class="navbar-item"><span class="has-text-weight-semibold has-site-branding">Name</span></a></div>
+      <div class="navbar-menu has-site-branding">
+        <div class="navbar-end">
+          <div class="navbar-item"><input class="input is-small is-rounded" id="search" type="search" size="30" maxlength="50" placeholder="Search..." onkeyup="redirect(event, value, '../../search/')"></div>
+          <div class="navbar-item has-dropdown is-hoverable"><a class="navbar-link has-site-branding">master</a>
+            <div class="navbar-dropdown is-right"><a href="../../../master/" class="navbar-item">master</a>
+              <hr class="navbar-divider">
+              <div class="navbar-item has-text-grey-light"><span>v</span><span>0.0.0</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="site-layout" id="site">
+      <aside class="menu p-3">
+        <p class="menu-label">General</p>
+        <ul class="menu-list has-site-branding">
+          <li><a href="../../" class="">Home</a><a href="../" class="is-active">Decisions</a><a href="../../software-systems/" class="">Software Systems</a><a href="../../modelo-de-datos-(iteración-actual)/" class="">Modelo de Datos (Iteración actual)</a></li>
+        </ul>
+        <p class="menu-label">Software systems</p>
+        <ul class="menu-list has-site-branding">
+          <li><a href="../../aws-s3/" class="">AWS S3</a><a href="../../begamer-components/" class="">BEGamer Components</a><a href="../../pasarela-de-pagos-(sandbox)/" class="">Pasarela de Pagos (Sandbox)</a><a href="../../servicio-impuestos-internos-(mock)/" class="">Servicio Impuestos Internos (Mock)</a><a href="../../sistema-de-correo/" class="">Sistema de Correo</a></li>
+        </ul>
+      </aside>
+      <div class="container is-fluid">
+        <div class="content p-3">
+          <div><h1>6. Almacenamiento de Archivos Multimedia: AWS S3 y Boto3</h1>
+<p><strong>Fecha:</strong> 2026-02-21 <strong>Estado:</strong> Aceptado</p>
+<h2>Contexto y Problema</h2>
+<p>El e-commerce requiere gestionar y servir imágenes de los componentes de hardware (productos). Almacenar estos archivos binarios pesados directamente en la base de datos PostgreSQL (como <code>bytea</code>) degradaría severamente el rendimiento y aumentaría los costos de la base de datos. Por otro lado, almacenar los archivos en el disco local del servidor rompería el principio <em>stateless</em> de la API, impidiendo el escalado horizontal en el futuro (si un servidor cae, las imágenes guardadas localmente se perderían).</p>
+<h2>Opciones Consideradas</h2>
+<ul>
+ <li><strong>Almacenamiento en Disco Local:</strong> Rechazado por romper la arquitectura <em>stateless</em>.</li>
+ <li><strong>Azure Blob Storage / Google Cloud Storage:</strong> Opciones empresariales válidas.</li>
+ <li><strong>AWS S3 (Amazon Simple Storage Service):</strong> Solución de almacenamiento de objetos líder en el mercado.</li>
+</ul>
+<h2>Decisión</h2>
+<p>Se utilizará <strong>AWS S3</strong> para el almacenamiento de todas las imágenes estáticas del sistema, interactuando con el servicio a través del SDK oficial de Python, <strong><code>boto3</code></strong>.</p>
+<h2>Justificación</h2>
+<ol>
+ <li><strong>Alineación con el Estándar de la Industria:</strong> AWS es el proveedor de nube con mayor adopción a nivel empresarial.</li>
+ <li><strong>Eficiencia de Costos (Capa Gratuita):</strong> El <em>Free Tier</em> de AWS ofrece 5 GB de almacenamiento estándar y 20,000 peticiones GET mensuales durante 12 meses, lo cual excede holgadamente las necesidades de un entorno de pruebas y exhibición académica.</li>
+ <li><strong>Desacoplamiento:</strong> Delegar la carga de archivos a un servicio de objetos externo (Object Storage) mantiene la API de FastAPI ligera.</li>
+</ol>
+<h2>Consecuencias</h2>
+<h3>Positivas</h3>
+<ul>
+ <li><strong>Fiabilidad:</strong> AWS S3 es un servicio altamente confiable y escalable.</li>
+ <li><strong>Valor Profesional:</strong> Incorpora el manejo de credenciales cloud, políticas IAM y SDKs empresariales al stack tecnológico del proyecto.</li>
+</ul>
+<h3>Negativas / Riesgos</h3>
+<ul>
+ <li><strong>Gestión de Secretos:</strong> Requiere disciplina estricta para no exponer las credenciales (<code>AWS_ACCESS_KEY_ID</code> y <code>AWS_SECRET_ACCESS_KEY</code>) en el control de versiones (GitHub). Se deberá utilizar obligatoriamente un archivo <code>.env</code>.</li>
+ <li><strong>Curva de Integración:</strong> Requiere aprender la sintaxis de <code>boto3</code>.</li>
+</ul></div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="../../../reformat-mermaid.js"></script>
+    <script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.9.0/dist/mermaid.esm.min.mjs';</script>
+  </body>
+</html>

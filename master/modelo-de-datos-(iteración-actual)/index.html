@@ -35,7 +35,7 @@
         </ul>
         <p class="menu-label">Software systems</p>
         <ul class="menu-list has-site-branding">
-          <li><a href="../begamer-components/" class="">BEGamer Components</a><a href="../pasarela-de-pagos-(sandbox)/" class="">Pasarela de Pagos (Sandbox)</a><a href="../servicio-impuestos-internos-(mock)/" class="">Servicio Impuestos Internos (Mock)</a><a href="../sistema-de-correo/" class="">Sistema de Correo</a></li>
+          <li><a href="../aws-s3/" class="">AWS S3</a><a href="../begamer-components/" class="">BEGamer Components</a><a href="../pasarela-de-pagos-(sandbox)/" class="">Pasarela de Pagos (Sandbox)</a><a href="../servicio-impuestos-internos-(mock)/" class="">Servicio Impuestos Internos (Mock)</a><a href="../sistema-de-correo/" class="">Sistema de Correo</a></li>
         </ul>
       </aside>
       <div class="container is-fluid">
@@ -47,8 +47,8 @@
         UUID user_id PK "UUIDv7"
         VARCHAR email UK "Unique"
         VARCHAR hashed_password
-        VARCHAR role
-        BOOLEAN is_active
+        VARCHAR role "Default: client"
+        BOOLEAN is_active "Default: True"
         DATETIME created_at
         DATETIME updated_at
     }
@@ -57,7 +57,7 @@
         UUID category_id PK "UUIDv7"
         VARCHAR name UK
         VARCHAR code UK "Ej: GPU"
-        BOOLEAN is_active
+        BOOLEAN is_active "Default: True"
         DATETIME created_at
         DATETIME updated_at
     }
@@ -66,7 +66,7 @@
         UUID brand_id PK "UUIDv7"
         VARCHAR name UK
         VARCHAR code UK "Ej: ASU"
-        BOOLEAN is_active
+        BOOLEAN is_active "Default: True"
         DATETIME created_at
         DATETIME updated_at
     }
@@ -74,30 +74,44 @@
     product {
         UUID product_id PK "UUIDv7"
         VARCHAR name UK "Unique, Index"
-        VARCHAR model_slug UK "Unique, Index"
+        VARCHAR slug UK "Unique, Index"
         TEXT description
         UUID category_id FK
         UUID brand_id FK
-        BOOLEAN is_active
+        BOOLEAN is_active "Default: True"
         DATETIME created_at
         DATETIME updated_at
     }
 
     product_variant {
-        UUID product_variant_id PK "UUIDv7"
+        UUID variant_id PK "UUIDv7"
         UUID product_id FK
         VARCHAR sku UK "Unique"
         DECIMAL price
         INTEGER stock
-        BOOLEAN is_active
+        BOOLEAN is_active "Default: True"
         DATETIME created_at
         DATETIME updated_at
     }
 
-    %% Relaciones
-    category ||--|{ product : "clasifica a"
-    brand    ||--|{ product : "fabrica a"
-    product  ||--|{ product_variant : "tiene variantes"</code></pre></div>
+    product_image {
+        UUID image_id PK "UUIDv7, Index"
+        VARCHAR image_url
+        BOOLEAN is_main "Default: False"
+        UUID product_id FK 
+        UUID variant_id FK "Nullable"
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    %% Relaciones (Corregidas a "Cero o Muchos")
+    category ||--o{ product : "clasifica a"
+    brand    ||--o{ product : "fabrica a"
+    product  ||--o{ product_variant : "tiene variantes"
+    
+    %% Relaciones de Imágenes
+    product         ||--o{ product_image : "tiene fotos genéricas"
+    product_variant ||--o{ product_image : "tiene fotos específicas"</code></pre></div>
         </div>
       </div>
     </div>

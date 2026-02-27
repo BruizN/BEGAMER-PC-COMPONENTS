@@ -10,6 +10,7 @@ left to right direction
 
 Person(Cliente, "Cliente", $descr="Persona interesada en armar o mejorar su PC.", $tags="", $link="")
 Person(Administrador, "Administrador", $descr="Gestiona el stock y los precios de componentes.", $tags="", $link="")
+System(AWSS3, "AWS S3", $descr="Almacena imágenes de productos y variantes.", $tags="", $link="")
 
 System_Boundary("BEGamerComponents_boundary", "BEGamer Components", $tags="") {
   Container(BEGamerComponents.APIBackend, "API Backend", $techn="Python 3.13 slim + FastAPI", $descr="Maneja la autenticación, autorización, y la lógica de negocio del catálogo.", $tags="", $link="")
@@ -19,6 +20,7 @@ System_Boundary("BEGamerComponents_boundary", "BEGamer Components", $tags="") {
 Rel(Administrador, BEGamerComponents.APIBackend, "Gestiona Categorías, Marcas, Productos y sus variantes (Swagger UI)", $techn="HTTPS/JSON", $tags="", $link="")
 Rel(Cliente, BEGamerComponents.APIBackend, "Consulta Productos Disponibles (Swagger UI)", $techn="HTTPS/JSON", $tags="", $link="")
 Rel(BEGamerComponents.APIBackend, BEGamerComponents.BasedeDatos, "Lee/Escribe datos del catálogo y usuarios", $techn="SQL/SQLModel", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend, AWSS3, "Lee/Escribe imágenes de productos y variantes", $techn="HTTPS / S3 API", $tags="", $link="")
 
 SHOW_LEGEND(true)
 @enduml

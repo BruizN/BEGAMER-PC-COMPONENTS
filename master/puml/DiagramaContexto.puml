@@ -13,12 +13,14 @@ System(BEGamerComponents, "BEGamer Components", $descr="Plataforma para buscar, 
 System(PasareladePagosSandbox, "Pasarela de Pagos (Sandbox)", $descr="Gestiona transacciones bancarias en ambiente de pruebas.", $tags="", $link="")
 System(ServicioImpuestosInternosMock, "Servicio Impuestos Internos (Mock)", $descr="Simula la validación y emisión de boletas para fines académicos.", $tags="", $link="")
 System(SistemadeCorreo, "Sistema de Correo", $descr="Envía confirmaciones de órdenes y recuperación de claves.", $tags="", $link="")
+System(AWSS3, "AWS S3", $descr="Almacena imágenes de productos y variantes.", $tags="", $link="")
 
+Rel(Cliente, BEGamerComponents, "Busca componentes y compra", $techn="", $tags="", $link="")
 Rel(Administrador, BEGamerComponents, "Gestiona inventario", $techn="", $tags="", $link="")
+Rel(BEGamerComponents, AWSS3, "Almacena imágenes de productos", $techn="", $tags="", $link="")
 Rel(BEGamerComponents, PasareladePagosSandbox, "Inicia transacción y valida estado", $techn="", $tags="", $link="")
 Rel(BEGamerComponents, ServicioImpuestosInternosMock, "Solicita folio y timbre electrónico (Simulado)", $techn="", $tags="", $link="")
 Rel(BEGamerComponents, SistemadeCorreo, "Envía correos electrónicos a clientes", $techn="", $tags="", $link="")
-Rel(Cliente, BEGamerComponents, "Busca componentes y compra", $techn="", $tags="", $link="")
 
 SHOW_LEGEND(true)
 @enduml
