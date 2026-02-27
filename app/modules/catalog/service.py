@@ -284,3 +284,13 @@ async def create_image(
         await image_repo.unset_main_image(session, image_data.product_id, image_data.variant_id)
     new_image = ProductImage.model_validate(image_data)
     return await image_repo.add_image(session, new_image)
+
+async def get_image(
+    session: AsyncSession,
+    image_id: uuid.UUID
+):
+    return await image_repo.get_image_by_id(session, image_id)
+
+async def delete_image(session, image_id) -> None:
+    await image_repo.remove_image(session, image_id)
+    return

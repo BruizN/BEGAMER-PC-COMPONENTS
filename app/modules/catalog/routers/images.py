@@ -80,3 +80,20 @@ async def upload_variant_image(
     )
 
     return await serv.create_image(session, image_data)
+
+
+@router.delete(
+    "/images/{image_id}", 
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete an image from AWS S3 and the database.")
+async def delete_image(
+    image_id: uuid.UUID,
+    session: SessionDep,
+    current_admin: CurrentAdmin,
+):
+    image = await serv.get_image(session, image_id)
+
+    await delete_image_from_s3(image.image_url)
+
+    await serv.delete_image(session, image_id)
+    return
