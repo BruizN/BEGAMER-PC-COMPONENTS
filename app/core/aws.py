@@ -4,6 +4,7 @@ from fastapi import UploadFile, HTTPException
 import uuid
 import os
 from dotenv import load_dotenv
+from starlette.concurrency import run_in_threadpool
 
 load_dotenv()
 
@@ -22,7 +23,7 @@ s3_client = boto3.client(
 )
 
 
-def upload_image_to_s3(file: UploadFile, folder: str = "products") -> str:
+async def upload_image_to_s3(file: UploadFile, folder: str = "products") -> str:
     """
     Sube una imagen a S3 y devuelve la URL
     """
@@ -32,7 +33,7 @@ def upload_image_to_s3(file: UploadFile, folder: str = "products") -> str:
         unique_filename = f"{folder}/{uuid.uuid4().hex}.{file_extension}"
 
         # Subir el archivo
-        s3_client.upload_fileobj(
+        await run_in_threadpool(s3_client.upload_fileobj,
             file.file,
             AWS_BUCKET_NAME,
             unique_filename,
@@ -52,7 +53,7 @@ def upload_image_to_s3(file: UploadFile, folder: str = "products") -> str:
         raise HTTPException(status_code=500, detail="Unexpected error")
 
     
-def delete_image_from_s3(image_url: str):
+async def delete_image_from_s3(image_url: str):
     """
     Elimina un archivo de AWS S3 a partir de su URL
     """
@@ -62,7 +63,7 @@ def delete_image_from_s3(image_url: str):
             if image_url.startswith(bucket_prefix):
                 object_key = image_url.replace(bucket_prefix, "")
 
-                s3_client.delete_object(
+                await run_in_threadpool(s3_client.delete_object,
                     Bucket=AWS_BUCKET_NAME,
                     Key=object_key
                 )

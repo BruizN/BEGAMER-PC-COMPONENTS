@@ -39,7 +39,7 @@ async def upload_product_image(
         )
     
     await serv.get_product(session, product_id, only_active=False)
-    image_url = upload_image_to_s3(file, "products")
+    image_url = await upload_image_to_s3(file, "products")
 
     image_data = ProductImageCreate(
         product_id=product_id,
