@@ -280,5 +280,7 @@ async def create_image(
     session: AsyncSession,
     image_data: ProductImageCreate
 ) -> ProductImage:
+    if image_data.is_main:
+        await image_repo.unset_main_image(session, image_data.product_id, image_data.variant_id)
     new_image = ProductImage.model_validate(image_data)
     return await image_repo.add_image(session, new_image)
