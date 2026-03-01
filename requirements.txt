@@ -61,3 +61,4 @@ watchfiles==1.1.1
 websockets==15.0.1
 python-slugify==8.0.4
 boto3==1.42.54
+redis==7.2.1
