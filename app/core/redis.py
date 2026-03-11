@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 import redis.asyncio as redis
 from typing import AsyncGenerator
 
+load_dotenv()
+
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
 
