@@ -1,5 +1,5 @@
 from fastapi.security import HTTPAuthorizationCredentials
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, Header, HTTPException, status
 from app.modules.auth.models import User
 from app.core.config import settings
 from app.core.security import http_bearer, http_bearer_optional
@@ -12,47 +12,44 @@ import uuid6
 
 SessionDep = Annotated[AsyncSession, Depends(get_db)]
 
+def _get_user_id_from_token(token: str, auto_error: bool = True) -> str | None:
+    """
+    Decodifica el JWT y extrae el ID del usuario
+    Si auto_error es True, lanza HTTPExceptions. Si es False, devuelve None.
+    """
+    try:
+        payload = jwt.decode(
+            token,
+            settings.jwt_secret,
+            algorithms=[settings.jwt_alg]
+        )
+        user_id_str = payload.get("sub")
+
+        if not user_id_str and auto_error:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid User Token")
+
+        return user_id_str
+
+    except jwt.ExpiredSignature:
+        if auto_error:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Expired Token")
+        return None
+    except jwt.PyJWTError:
+        if auto_error:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token")
+        return None
+
+
 async def get_current_user(
     session: SessionDep,
     token_auth: HTTPAuthorizationCredentials = Depends(http_bearer)
 ) -> User:
-    token = token_auth.credentials
 
-    try:
-        payload = jwt.decode(
-            token, 
-            settings.jwt_secret, 
-            algorithms=[settings.jwt_alg]
-            )
-        user_id_str = payload.get("sub")
-
-        if user_id_str is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, 
-                detail="Invalid User Token"
-                )
-
-        user_uuid = uuid6.UUID(user_id_str)
-
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Expired token"
-        )
-    
-    except jwt.InvalidTokenError: 
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail="Invalid token"
-        )
-        
-    user = await repo.get_user_by_id(session, user_uuid)
+    user_id_str = _get_user_id_from_token(token_auth.credentials, auto_error=True)
+    user = await repo.get_user_by_id(session, uuid6.UUID(user_id_str))
 
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail="User not found"
-            ) 
+        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="User not found")
     
     return user
 
@@ -73,37 +70,40 @@ CurrentAdmin = Annotated[User, Depends(get_current_admin)]
 
 async def get_current_user_optional(
     session: SessionDep,
-    token_auth: HTTPAuthorizationCredentials = Depends(http_bearer_optional)
+    token_auth: HTTPAuthorizationCredentials | None = Depends(http_bearer_optional)
 ) -> User | None:
     if not token_auth:
         return None
 
-    token = token_auth.credentials
-
-    try:
-        payload = jwt.decode(
-            token, 
-            settings.jwt_secret, 
-            algorithms=[settings.jwt_alg]
-            )
-        user_id_str = payload.get("sub")
-
-        if user_id_str is None:
-            return None
-
-        user_uuid = uuid6.UUID(user_id_str)
-
-    except jwt.ExpiredSignatureError:
+    user_id_str = _get_user_id_from_token(token_auth.credentials, auto_error=False)
+    if not user_id_str:
         return None
-    
-    except jwt.InvalidTokenError: 
-        return None
-        
-    user = await repo.get_user_by_id(session, user_uuid)
 
-    if not user:
-        return None
-    
-    return user
+    return await repo.get_user_by_id(session, uuid6.UUID(user_id_str))
 
 CurrentUserOptional = Annotated[User | None, Depends(get_current_user_optional)]
+
+
+
+
+async def get_cart_indentifier(
+    token: HTTPAuthorizationCredentials | None = Depends(http_bearer_optional),
+    x_guest_session_id: str | None = Header(default=None, alias="X-Guest-Session-ID")
+) -> tuple[str, str]:
+    """
+    Identifica al dueño del carrito.
+    Retorna: ("user", "uuid") o ("guest", "uuid").
+    """
+    if token:
+        user_id = _get_user_id_from_token(token.credentials, auto_error=True)
+        return ("user", user_id)
+    
+    if x_guest_session_id:
+        return ("guest", x_guest_session_id)
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="A valid token or the 'X-Guest-Session-ID' header is needed in order to use the cart."
+    )
+
+CartIdentifier = Annotated[tuple[str, str], Depends(get_cart_indentifier)]
