@@ -53,3 +53,90 @@ async def add_item_to_cart(
     await redis_client.expire(cart_key, ttl)
 
     return {"message": "Item added to cart", "current_quantity": new_quantity}
+
+
+async def get_cart(
+    redis_client: redis.Redis,
+    session: AsyncSession,
+    identity: tuple[str, str]
+) -> cart_schemas.CartResponse:
+
+    cart_key, _ = _get_cart_key_and_ttl(identity)
+    cart_data = await redis_client.hgetall(cart_key)
+
+    response = cart_schemas.CartResponse(cart_id=cart_key)
+
+    if not cart_data:
+        return response
+    
+    total_price = Decimal("0.00")
+
+    for variant_id_str, quantity_str in cart_data.items():
+        quantity = int (quantity_str)
+        variant_uuid = uuid.UUID(variant_id_str)
+
+        try:
+            variant = await catalog_service.get_variant(session, variant_uuid)
+
+            main_image_url = None
+            if variant.images:
+                main_img = next((img for img in variant.images if img.is_main), variant.images[0])
+                main_image_url = main_img.image_url
+            elif variant.product.images:
+                main_img = next((img for img in variant.product.images if img.is_main), variant.product.images[0])
+                main_image_url = main_img.image_url
+            
+            subtotal = variant.price * Decimal(quantity)
+            total_price += subtotal
+
+            item_response = cart_schemas.CartItemResponse(
+                variant_id=variant.variant_id,
+                product_id=variant.product_id,
+                name=variant.product.name,
+                sku=variant.sku,
+                image_url=main_image_url,
+                unit_price=variant.price,
+                quantity=quantity,
+                subtotal=subtotal
+            )
+            response.items.append(item_response)
+
+        except HTTPException:
+            # Si la variante ya no existe en la BD se borra silenciosamente del carrito del usuario en Redis
+            await redis_client.hdel(cart_key, variant_id_str)
+
+    response.total_price = total_price
+    return response
+
+
+async def update_item_quantity(
+    redis_client: redis.Redis,
+    session: AsyncSession,
+    identity: tuple[str, str],
+    variant_id: uuid.UUID,
+    update_data: cart_schemas.CartItemUpdate
+) -> dict:
+
+    cart_key, ttl = _get_cart_key_and_ttl(identity)
+    variant_id_str = str(variant_id)
+
+    if update_data.quantity == 0:
+        await redis_client.hdel(cart_key, variant_id_str)
+        return {"message": "Item removed from cart"}
+
+    await catalog_service.get_variant(session, variant_id)
+
+    await redis_client.hset(cart_key, variant_id_str, update_data.quantity)
+    await redis_client.expire(cart_key, ttl)
+
+    return {"message": "Quantity updated", "new_quantity": update_data.quantity}
+
+
+async def remove_item_from_cart(
+    redis_client: redis.Redis,
+    identity: tuple[str, str],
+    variant_id: uuid.UUID
+) -> None:
+
+    cart_key, _ = _get_cart_key_and_ttl(identity)
+    await redis_client.hdel(cart_key, str(variant_id))
