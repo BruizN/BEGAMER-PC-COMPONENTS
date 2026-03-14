@@ -31,6 +31,7 @@ from app.modules.catalog.exceptions import (
 )
 from app.modules.auth.router import router as auth_router
 from app.modules.catalog.routers import catalog_router
+from app.modules.cart.router import cart_router
 
 app = FastAPI(
     title="BEGamer components", 
@@ -59,3 +60,4 @@ async def health():
 #Routers por módulo
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(catalog_router)
+app.include_router(cart_router, prefix="/cart", tags=["Cart"])
