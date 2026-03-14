@@ -140,3 +140,40 @@ async def remove_item_from_cart(
 
     cart_key, _ = _get_cart_key_and_ttl(identity)
     await redis_client.hdel(cart_key, str(variant_id))
+
+
+async def merge_guest_cart_into_user_cart(
+    redis_client: redis.Redis,
+    guest_session_id: str,
+    user_id: str
+) -> None:
+    """
+    Fusiona el carrito de un visitante en el carrito de un usuario autenticado.
+    Se ejecuta como una tarea en segundo plano durante el login.
+    """
+    guest_key = f"cart:guest:{guest_session_id}"
+    user_key = f"cart:user:{user_id}"
+
+    guest_cart = await redis_client.hgetall(guest_key)
+
+    if not guest_cart:
+        return
+
+    for variant_id_str, guest_quantity_str in guest_cart.items():
+        guest_quantity = int(guest_quantity_str)
+
+        user_quantity_bytes = await redis_client.hget(user_key, variant_id_str)
+        user_quantity = int(user_quantity_bytes) if user_quantity_bytes else 0
+
+        new_quantity = user_quantity + guest_quantity
+
+        if new_quantity > 10:
+            new_quantity = 10
+        
+        await redis_client.hset(user_key, variant_id_str, new_quantity)
+    
+    await redis_client.delete(guest_key)
+
+    await redis_client.expire(user_key, USER_CART_TTL)
+
+
