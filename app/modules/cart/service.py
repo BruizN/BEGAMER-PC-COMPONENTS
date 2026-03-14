@@ -31,7 +31,7 @@ async def add_item_to_cart(
     cart_key, ttl = _get_cart_key_and_ttl(identity)
     variant_id_str = str(item_data.variant_id)
 
-    variant = await catalog_service.get_variant(session, item_data.variant_id)
+    variant = await catalog_service.get_variant(session, item_data.variant_id, only_active=True)
 
     if variant.stock < item_data.quantity:
         raise HTTPException(status_code=409, detail=f"Just {variant.stock} left!")
@@ -76,7 +76,7 @@ async def get_cart(
         variant_uuid = uuid.UUID(variant_id_str)
 
         try:
-            variant = await catalog_service.get_variant(session, variant_uuid)
+            variant = await catalog_service.get_variant(session, variant_uuid, only_active=True)
 
             main_image_url = None
             if variant.images:
@@ -124,7 +124,7 @@ async def update_item_quantity(
         await redis_client.hdel(cart_key, variant_id_str)
         return {"message": "Item removed from cart"}
 
-    await catalog_service.get_variant(session, variant_id)
+    await catalog_service.get_variant(session, variant_id, only_active=True)
 
     await redis_client.hset(cart_key, variant_id_str, update_data.quantity)
     await redis_client.expire(cart_key, ttl)
