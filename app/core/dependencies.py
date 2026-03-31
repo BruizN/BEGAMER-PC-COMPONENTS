@@ -30,7 +30,7 @@ def _get_user_id_from_token(token: str, auto_error: bool = True) -> str | None:
 
         return user_id_str
 
-    except jwt.ExpiredSignature:
+    except jwt.ExpiredSignatureError:
         if auto_error:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Expired Token")
         return None

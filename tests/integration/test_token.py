@@ -25,7 +25,7 @@ async def test_protected_route_rejects_expired_token(client):
     )
 #   Validar que la API lo rechace
     assert response.status_code == 401
-    assert "Expired token" in response.text
+    assert "Expired Token" in response.text
 
 async def test_protected_route_rejects_tampered_token(client):
     """
@@ -53,4 +53,4 @@ async def test_protected_route_rejects_tampered_token(client):
     )
 
     assert response.status_code == 401
-    assert "Invalid token" in response.text
+    assert "Invalid Token" in response.text
