@@ -70,16 +70,13 @@ workspace {
         cart_router -> cart_service "Pasa datos y delega lógica" "Llamada asíncrona"
         cart_service -> redis_client "Calcula TTL y ejecuta comandos (HSET, HGETALL)" "Llamada asíncrona"
 
-        # --- Flujo 2: El Merge (La magia durante el Login) ---
+        # --- Flujo 2: El Merge---
         cliente -> auth_router "Inicia sesión enviando credenciales y X-Guest-Session-ID" "HTTPS/JSON"
         
-        # Aquí está la clave: El Auth Router usa BackgroundTasks para llamar al Cart Service
         auth_router -> cart_service "Encola tarea en segundo plano (merge_guest_cart...)" "FastAPI BackgroundTasks"
         
-        # El servicio hace su trabajo en Redis
         cart_service -> redis_client "Mueve items de la key 'guest' a la key 'user' y borra la vieja" "Llamada asíncrona"
 
-        # --- Conexión al exterior (Base de Datos) ---
         # El cliente de Redis se conecta al contenedor de Redis real
         redis_client -> redis "Ejecuta transacciones en memoria" "TCP/RESP"
         
