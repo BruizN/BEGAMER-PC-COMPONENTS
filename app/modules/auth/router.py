@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Header
+from fastapi import APIRouter, Depends, BackgroundTasks, Header
 import redis.asyncio as redis
 from app.core.redis import get_redis_client
 from app.modules.cart.service import merge_guest_cart_into_user_cart

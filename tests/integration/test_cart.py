@@ -1,4 +1,3 @@
-from app.modules.cart.service import USER_CART_TTL
 
 
 
