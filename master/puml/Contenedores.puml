@@ -1,6 +1,6 @@
 @startuml
 set separator none
-title Nivel 2: Contenedores
+title BEGamer Components - Containers
 
 left to right direction
 
@@ -10,17 +10,19 @@ left to right direction
 
 Person(Cliente, "Cliente", $descr="Persona interesada en armar o mejorar su PC.", $tags="", $link="")
 Person(Administrador, "Administrador", $descr="Gestiona el stock y los precios de componentes.", $tags="", $link="")
-System(AWSS3, "AWS S3", $descr="Almacena imágenes de productos y variantes.", $tags="", $link="")
+System(AWSS3, "AWS S3", $descr="Almacena imágenes.", $tags="", $link="")
 
 System_Boundary("BEGamerComponents_boundary", "BEGamer Components", $tags="") {
+  ContainerDb(BEGamerComponents.BasedeDatos, "Base de Datos", $techn="PostgreSQL 15-alpine", $descr="Almacena usuarios, productos, etc.", $tags="", $link="")
+  ContainerDb(BEGamerComponents.CachéyCarrito, "Caché y Carrito", $techn="Redis 7-alpine", $descr="Almacena datos temporales.", $tags="", $link="")
   Container(BEGamerComponents.APIBackend, "API Backend", $techn="Python 3.13 slim + FastAPI", $descr="Maneja la autenticación, autorización, y la lógica de negocio del catálogo.", $tags="", $link="")
-  ContainerDb(BEGamerComponents.BasedeDatos, "Base de Datos", $techn="PostgreSQL 15-alpine", $descr="Almacena usuarios, roles, hashes de contraseñas, productos, marcas y categorías.", $tags="", $link="")
 }
 
-Rel(Administrador, BEGamerComponents.APIBackend, "Gestiona Categorías, Marcas, Productos y sus variantes (Swagger UI)", $techn="HTTPS/JSON", $tags="", $link="")
-Rel(Cliente, BEGamerComponents.APIBackend, "Consulta Productos Disponibles (Swagger UI)", $techn="HTTPS/JSON", $tags="", $link="")
-Rel(BEGamerComponents.APIBackend, BEGamerComponents.BasedeDatos, "Lee/Escribe datos del catálogo y usuarios", $techn="SQL/SQLModel", $tags="", $link="")
-Rel(BEGamerComponents.APIBackend, AWSS3, "Lee/Escribe imágenes de productos y variantes", $techn="HTTPS / S3 API", $tags="", $link="")
+Rel(Administrador, BEGamerComponents.APIBackend, "Gestiona Categorías, Marcas, Productos", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(Cliente, BEGamerComponents.APIBackend, "Consulta Productos Disponibles", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend, BEGamerComponents.BasedeDatos, "Lee/Escribe datos", $techn="SQL/SQLModel", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend, AWSS3, "Lee/Escribe imágenes", $techn="HTTPS / S3 API", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend, BEGamerComponents.CachéyCarrito, "Lee/Escribe estado de carritos", $techn="TCP/RESP", $tags="", $link="")
 
 SHOW_LEGEND(true)
 @enduml

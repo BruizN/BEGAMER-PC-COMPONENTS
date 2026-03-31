@@ -1,0 +1,46 @@
+@startuml
+set separator none
+title BEGamer Components - API Backend - Components
+
+left to right direction
+
+!include <C4/C4>
+!include <C4/C4_Context>
+!include <C4/C4_Container>
+!include <C4/C4_Component>
+
+Person(Cliente, "Cliente", $descr="Persona interesada en armar o mejorar su PC.", $tags="", $link="")
+Person(Administrador, "Administrador", $descr="Gestiona el stock y los precios de componentes.", $tags="", $link="")
+ContainerDb(BEGamerComponents.BasedeDatos, "Base de Datos", $techn="PostgreSQL 15-alpine", $descr="Almacena usuarios, productos, etc.", $tags="", $link="")
+ContainerDb(BEGamerComponents.CachéyCarrito, "Caché y Carrito", $techn="Redis 7-alpine", $descr="Almacena datos temporales.", $tags="", $link="")
+System(AWSS3, "AWS S3", $descr="Almacena imágenes.", $tags="", $link="")
+
+Container_Boundary("BEGamerComponents.APIBackend_boundary", "API Backend", $tags="") {
+  Component(BEGamerComponents.APIBackend.CartRouter, "Cart Router", $techn="FastAPI APIRouter", $descr="Maneja endpoints CRUD del carrito temporal.", $tags="", $link="")
+  Component(BEGamerComponents.APIBackend.CartService, "Cart Service", $techn="Python Module", $descr="Orquesta lógica del carrito y la fusión (merge) de cuentas.", $tags="", $link="")
+  Component(BEGamerComponents.APIBackend.CartIdentifier, "Cart Identifier", $techn="FastAPI Depends", $descr="Extrae la identidad del usuario (Token o X-Guest-Session-ID).", $tags="", $link="")
+  Component(BEGamerComponents.APIBackend.RedisClient, "Redis Client", $techn="redis.asyncio", $descr="Conexión asíncrona a Redis mediante ConnectionPool.", $tags="", $link="")
+  Component(BEGamerComponents.APIBackend.CatalogRouter, "Catalog Router", $techn="FastAPI APIRouter", $descr="Maneja endpoints de catálogo e imágenes.", $tags="", $link="")
+  Component(BEGamerComponents.APIBackend.CatalogService, "Catalog Service", $techn="Python Module", $descr="Orquesta el CRUD de catálogo.", $tags="", $link="")
+  Component(BEGamerComponents.APIBackend.S3Client, "S3 Client", $techn="Boto3", $descr="Envoltura para el SDK de AWS.", $tags="", $link="")
+  Component(BEGamerComponents.APIBackend.CatalogRepository, "Catalog Repository", $techn="SQLModel", $descr="Actualiza/lee las tablas de catálogo.", $tags="", $link="")
+  Component(BEGamerComponents.APIBackend.AuthRouter, "Auth Router", $techn="FastAPI APIRouter", $descr="Maneja el login y emite JWT.", $tags="", $link="")
+}
+
+Rel(Administrador, BEGamerComponents.APIBackend.CatalogRouter, "Sube/elimina imagen", $techn="HTTPS/Multipart", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend.CatalogRouter, BEGamerComponents.APIBackend.S3Client, "Envía archivo binario o la url de una imagen existente", $techn="Async", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend.CatalogRouter, BEGamerComponents.APIBackend.CatalogService, "Pasa DTO con nueva URL o id de la imagen", $techn="Async", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend.CatalogService, BEGamerComponents.APIBackend.CatalogRepository, "Actualiza registro", $techn="Method Call", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend.S3Client, AWSS3, "Sube/elimina objeto", $techn="HTTPS / AWS API", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend.CatalogRepository, BEGamerComponents.BasedeDatos, "Ejecuta UPDATE/DELETE", $techn="SQLModel", $tags="", $link="")
+Rel(Cliente, BEGamerComponents.APIBackend.CartRouter, "Añade/modifica items (POST /items, PATCH...)", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend.CartRouter, BEGamerComponents.APIBackend.CartIdentifier, "Inyecta dependencia para saber si es Guest o User", $techn="Inyección", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend.CartRouter, BEGamerComponents.APIBackend.CartService, "Pasa datos y delega lógica", $techn="Llamada asíncrona", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend.CartService, BEGamerComponents.APIBackend.RedisClient, "Calcula TTL y ejecuta comandos (HSET, HGETALL)", $techn="Llamada asíncrona", $tags="", $link="")
+Rel(Cliente, BEGamerComponents.APIBackend.AuthRouter, "Inicia sesión enviando credenciales y X-Guest-Session-ID", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend.AuthRouter, BEGamerComponents.APIBackend.CartService, "Encola tarea en segundo plano (merge_guest_cart...)", $techn="FastAPI BackgroundTasks", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend.CartService, BEGamerComponents.APIBackend.RedisClient, "Mueve items de la key 'guest' a la key 'user' y borra la vieja", $techn="Llamada asíncrona", $tags="", $link="")
+Rel(BEGamerComponents.APIBackend.RedisClient, BEGamerComponents.CachéyCarrito, "Ejecuta transacciones en memoria", $techn="TCP/RESP", $tags="", $link="")
+
+SHOW_LEGEND(true)
+@enduml
