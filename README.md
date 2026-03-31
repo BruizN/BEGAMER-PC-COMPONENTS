@@ -82,19 +82,6 @@ Para simular un entorno real, el desarrollo sigue estas reglas:
 * **Pull Requests:** Ningún código entra a producción sin pasar por una PR que cumpla:
     1.  Pasar el Pipeline de CI (Tests + Linter `Ruff`).
     2.  Cumplir con la plantilla de descripción de cambios.
-
-## 🤖 Desarrollo Aumentado por IA (AI-Assisted Engineering)
-
-Este proyecto abraza el uso de Inteligencia Artificial Generativa como una herramienta de productividad y aprendizaje acelerado, no como un sustituto del ingeniero.
-
-Mi enfoque de trabajo con IA se rige por los siguientes principios:
-
-* **Copilot, no Autopilot:** Utilizo LLMs para generar *boilerplate*, sugerir casos de test y explorar patrones de diseño, pero **la arquitectura y la lógica de negocio son diseño propio**.
-* **Criterio Ingenieril:** La IA a menudo puede sugiere soluciones obsoletas o inseguras. Mi rol es auditar, corregir y optimizar cada línea de código sugerida antes de integrarla.
-* **Herramienta de Aprendizaje:** Uso la IA para profundizar en conceptos avanzados (como la implementación interna de UUIDv7 o estrategias de índices en Postgres) y entender el "por qué" detrás de cada implementación.
-
-> *"La IA propone, el ingeniero dispone."*
-
 ---
 
 ## ⚡ Instalación y Ejecución
@@ -112,41 +99,26 @@ El proyecto está dockerizado para facilitar el despliegue.
     cd begamer-pc-components
     ```
 
-2.  **Configurar Variables de Entorno:**
-    Crea un archivo `.env` en la raíz (puedes copiar el ejemplo abajo).
+2.  **Configuración de Almacenamiento (AWS S3) y configurar Variables de Entorno:**
+Este proyecto utiliza **Amazon S3** para el almacenamiento de archivos e imágenes. Para el entorno de desarrollo, se asume el uso de una cuenta con el **Free Tier** activo.
+
+#### Requisitos en AWS
+1. **IAM User**: Crea un usuario en la consola de IAM con acceso programático.
+2. **Políticas**: Asigna la política `AmazonS3FullAccess` a dicho usuario.
+3. **Bucket**: Crea un bucket en S3 y asegúrate de que la región coincida con la configurada en el código.
+
+Finalmente crea un archivo `.env` en la raíz (Revisa el .env.example).
     > **Nota:** Para Docker, la URL de la base de datos debe usar el host `db`, no `localhost`.
 
-    ```env
-    # --- SEGURIDAD ---
-    SECRET_KEY=7a9c8d2e1f3b4a5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c
-    ALGORITHM=HS256
-    ACCESS_TOKEN_EXPIRE_MINUTES=60
-
-    # --- BASE DE DATOS ---
-    POSTGRES_USER=admin
-    POSTGRES_PASSWORD=Gamer_2026
-    POSTGRES_DB=Begamer
-    POSTGRES_DB_TEST=begamer_test
-
-    # --- URLs DE CONEXIÓN (IMPORTANTE) ---
-    # Para la App dentro de Docker:
-    POSTGRES_URL=postgresql+asyncpg://admin:Gamer_2026@db:5432/Begamer
     
-    # Para Tests (que corren en una red de prueba interna):
-    TEST_DATABASE_URL=postgresql+asyncpg://admin:Gamer_2026@db_test:5432/begamer_test
-    
-    # Datos del Admin Inicial
-    FIRST_SUPERUSER_EMAIL=begamer@gmail.com
-    FIRST_SUPERUSER_PASSWORD=BegamerAdmin2026
-    ```
 
-3.  **Levantar el sistema:**
+5.  **Levantar el sistema:**
     ```bash
     docker-compose up --build -d
     ```
     *Espera unos segundos a que la base de datos esté saludable (healthy).*
 
-4.  **Aplicar Migraciones y Crear Admin:**
+6.  **Aplicar Migraciones y Crear Admin:**
     Ejecuta estos comandos *dentro* del contenedor backend (así evitas problemas de dependencias locales):
 
     ```bash
@@ -157,7 +129,7 @@ El proyecto está dockerizado para facilitar el despliegue.
     docker-compose exec backend python -m scripts.seed_admin
     ```
 
-5.  **¡Listo! Accede a la API:**
+7.  **Listo. Accede a la API:**
     * 📄 **Swagger UI:** http://localhost:8000/docs
     * 📑 **Redoc:** http://localhost:8000/redoc
 
@@ -176,5 +148,3 @@ docker-compose run --rm backend pytest
 * Estudiante de Ingeniería en Informática (Duoc UC)
 * Desarrollador Backend Autodidacta
 * [GitHub Profile](https://github.com/BruizN)
-
-Made with ❤️, lots of coffee and Python.
