@@ -46,5 +46,18 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+      image: redis:7-alpine
+      container_name: begamer_redis
+      ports:
+        - "6379:6379"
+      volumes:
+        - redis_data:/data
+      # El comando appendonly le dice a Redis que guarde una copia en disco 
+      # por si el contenedor se reinicia, para que los clientes no pierdan su carrito
+      command: redis-server --appendonly yes
+
+
 volumes:
   pg_data:
+  redis_data:

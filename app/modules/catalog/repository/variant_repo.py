@@ -72,6 +72,7 @@ async def get_variant_by_id(
         .options(
             joinedload(ProductVariant.product).joinedload(Product.category),
             joinedload(ProductVariant.product).joinedload(Product.brand),
+            joinedload(ProductVariant.product).joinedload(Product.images),
             joinedload(ProductVariant.images)
         )
     )
