@@ -12,14 +12,14 @@
 
 **BeGamer Components** es una API RESTful asíncrona para una plataforma de e-commerce de hardware de PC.
 
-El objetivo principal de este proyecto no es solo "que funcione", sino demostrar **cómo se construye software mantenible, escalable y seguro**. Se ha implementado siguiendo flujos de trabajo profesionales como Kanban, CI/CD y revisiones de código estrictas.
-
 ### ✨ Características Principales (Hasta ahora)
 * **Gestión de Catálogo:** CRUD completo para Productos, Marcas y Categorías con soporte para *Soft Delete* y Slugs automáticos.
 * **Seguridad Robusta:** Autenticación JWT (Stateless) y hashing de contraseñas con **Argon2**.
 * **Identificadores Modernos:** Implementación de **UUIDv7** para claves primarias (Time-sortable), optimizando la indexación en base de datos frente a UUIDv4.
 * **Roles y Permisos:** Sistema RBAC (Role-Based Access Control) diferenciando entre Clientes y Administradores.
 * **Arquitectura Limpia:** Diseño modular con separación de responsabilidades (Router → Service → Repository).
+* **AWS S3:** Implementación de AWS S3 para la gestión de imagenes.
+* **Gestión de Carrito en Redis:**: Almacenamiento rápido para usuarios anónimos y autenticados. Incluye Cart Merging automático en segundo plano, fusionando y consolidando las cantidades del carrito temporal al iniciar sesión o registrarse.
 
 ## 🔮 Roadmap & Próximos Pasos
 
@@ -28,27 +28,6 @@ El proyecto está en constante evolución. Actualmente, el foco de desarrollo es
 * 💳 **Pasarela de Pagos (Sandbox):**
     * Integración con **Webpay (Transbank)** en ambiente de pruebas.
     * Simulación completa del flujo de compra: *Inicio de transacción -> Pago en pasarela -> Validación de retorno -> Generación de Orden*.
-
-* 🖼️ **Gestión de Imágenes:**
-    * Sistema robusto para la subida, validación y optimización de imágenes de productos.
-    * Estrategia de almacenamiento eficiente para activos estáticos.
-
----
-
-## 🛠️ Stack Tecnológico
-
-### Backend Core
-* **Lenguaje:** Python 3.13
-* **Framework:** FastAPI (Asíncrono)
-* **ORM:** SQLModel (SQLAlchemy + Pydantic)
-* **Base de Datos:** PostgreSQL 15
-
-### Ingeniería & DevOps
-* **Contenerización:** Docker & Docker Compose
-* **Migraciones:** Alembic
-* **Testing:** Pytest (Tests de Integración y Unitarios)
-* **CI/CD:** GitHub Actions (Linting, Testing y Generación de Documentación)
-
 ---
 
 ## 🏗️ Arquitectura y Documentación
@@ -112,13 +91,13 @@ Finalmente crea un archivo `.env` en la raíz (Revisa el .env.example).
 
     
 
-5.  **Levantar el sistema:**
+3.  **Levantar el sistema:**
     ```bash
     docker-compose up --build -d
     ```
     *Espera unos segundos a que la base de datos esté saludable (healthy).*
 
-6.  **Aplicar Migraciones y Crear Admin:**
+4.  **Aplicar Migraciones y Crear Admin:**
     Ejecuta estos comandos *dentro* del contenedor backend (así evitas problemas de dependencias locales):
 
     ```bash
@@ -129,7 +108,7 @@ Finalmente crea un archivo `.env` en la raíz (Revisa el .env.example).
     docker-compose exec backend python -m scripts.seed_admin
     ```
 
-7.  **Listo. Accede a la API:**
+5.  **Listo. Accede a la API:**
     * 📄 **Swagger UI:** http://localhost:8000/docs
     * 📑 **Redoc:** http://localhost:8000/redoc
 
