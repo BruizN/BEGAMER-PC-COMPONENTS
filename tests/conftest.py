@@ -18,6 +18,9 @@ from app.modules.auth.models import User
 from app.modules.catalog.models import Category, Brand, Product, ProductVariant
 from app.modules.catalog.service import _generate_sku
 
+import fakeredis
+from app.core.redis import get_redis_client
+
 load_dotenv()
 
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
@@ -287,3 +290,18 @@ async def variant_factory(db_session, product_factory):
     return _create_variant
         
         
+@pytest.fixture
+async def redis_mock():
+    fake_client = fakeredis.FakeAsyncRedis(decode_responses=True)
+    yield fake_client
+    await fake_client.aclose()
+    
+
+@pytest.fixture
+async def override_redis(client, redis_mock):
+    """
+    Reemplaza la dependencia get_redis_client de FastAPI por FakeRedis.
+    """
+    app.dependency_overrides[get_redis_client] = lambda: redis_mock
+    yield
+    app.dependency_overrides.pop(get_redis_client, None)
